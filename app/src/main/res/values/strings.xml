@@ -2,7 +2,6 @@
     <string name="app_name">BlogPosts</string>
     <string name="log_out">Log out</string>
     <string name="write_a_blog_title">Write a blog title…</string>
-    <string name="touch_to_change_image">Touch to change image</string>
     <string name="write_some_content">Write some content…</string>
 
     <!-- Intent extras -->
@@ -82,7 +81,6 @@
     <string name="text_forgot_password">Forgot password</string>
     <string name="process_death_state">process_death_state</string>
     <string name="invalid_login_credentials">Invalid login</string>
-    <string name="the_title_of_a_blog">The Title of a Blog</string>
     <string name="touch_to_change_image">Touch to change image</string>
     <string name="this_is_some_blog_content">This is some blog content</string>
     <string name="the_title_of_a_blog">The Title of a Blog</string>
