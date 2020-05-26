@@ -13,6 +13,7 @@ import com.example.blogposts.persistesnce.AppDatabase
 import com.example.blogposts.persistesnce.AppDatabase.Companion.DATABASE_NAME
 import com.example.blogposts.persistesnce.AuthTokenDao
 import com.example.blogposts.utils.Constants
+import com.example.blogposts.utils.LiveDataCallAdapterFactory
 import com.example.blogposts.utils.PreferenceKeys
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
@@ -48,9 +49,10 @@ class AppModule {
 
     @Singleton
     @Provides
-    fun provideRetrofitBuilder(gsonBuilder: Gson): Retrofit.Builder {
+    fun provideRetrofitBuilder(gSon: Gson): Retrofit.Builder {
         return Retrofit.Builder().baseUrl(Constants.BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create(gsonBuilder))
+            .addCallAdapterFactory(LiveDataCallAdapterFactory())
+            .addConverterFactory(GsonConverterFactory.create(gSon))
     }
 
     @Singleton

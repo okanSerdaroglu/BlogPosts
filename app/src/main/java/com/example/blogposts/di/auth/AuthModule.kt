@@ -14,9 +14,8 @@ class AuthModule {
 
     @AuthScope
     @Provides
-    fun provideFakeApiService(): BlogPostsAuthService {
-        return Retrofit.Builder()
-            .baseUrl("https://open-api.xyz")
+    fun provideFakeApiService(retrofitBuilder: Retrofit.Builder): BlogPostsAuthService {
+        return retrofitBuilder
             .build().create(BlogPostsAuthService::class.java)
     }
 
