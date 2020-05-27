@@ -7,9 +7,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import com.example.blogposts.R
-import com.example.blogposts.utils.ApiEmptyResponse
-import com.example.blogposts.utils.ApiErrorResponse
-import com.example.blogposts.utils.ApiSuccessResponse
+import com.example.blogposts.ui.auth.state.RegistrationFields
+
+import kotlinx.android.synthetic.main.fragment_change_password.*
+import kotlinx.android.synthetic.main.fragment_register.*
 
 class RegisterFragment : BaseAuthFragment() {
 
@@ -24,23 +25,37 @@ class RegisterFragment : BaseAuthFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         Log.d(TAG, "RegisterFragment: ${viewModel.hashCode()}")
-        viewModel.testRegister().observe(viewLifecycleOwner, Observer { response ->
-            when (response) {
-                is ApiSuccessResponse -> {
-                    Log.d(TAG, "REGISTER RESPONSE: ${response.body}")
+        subscribeObservers()
+    }
+
+    private fun subscribeObservers() {
+        viewModel.viewState.observe(viewLifecycleOwner, Observer {
+            it.registrationFields?.let { registerFields ->
+                registerFields.registrationEmail?.let { email ->
+                    input_email.setText(email)
                 }
-
-                is ApiErrorResponse -> {
-                    Log.d(TAG, "REGISTER RESPONSE: ${response.errorMessage}")
+                registerFields.registrationUsername?.let { username ->
+                    input_username.setText(username)
                 }
-
-                is ApiEmptyResponse -> {
-                    Log.d(TAG, "REGISTER RESPONSE: EMPTY RESPONSE")
-
+                registerFields.registrationPassword?.let { password ->
+                    input_password.setText(password)
+                }
+                registerFields.registrationConfirmPassword?.let { confirmPassword ->
+                    input_confirm_new_password.setText(confirmPassword)
                 }
             }
         })
     }
 
-
+    override fun onDestroyView() {
+        super.onDestroyView()
+        viewModel.setRegistrationFields(
+            RegistrationFields(
+                input_email.text.toString(),
+                input_username.text.toString(),
+                input_password.text.toString(),
+                input_confirm_new_password.text.toString()
+            )
+        )
+    }
 }

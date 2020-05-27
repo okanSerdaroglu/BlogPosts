@@ -31,7 +31,7 @@ class LoginFragment : BaseAuthFragment() {
         subscribeObservers()
     }
 
-    fun subscribeObservers() {
+    private fun subscribeObservers() {
         viewModel.viewState.observe(viewLifecycleOwner, Observer {
             it.loginFields?.let { loginFields ->
                 loginFields.login_email?.let { email ->
