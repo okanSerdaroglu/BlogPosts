@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import com.example.blogposts.R
+import com.example.blogposts.ui.auth.state.AuthStateEvent
 import com.example.blogposts.ui.auth.state.RegistrationFields
 
 import kotlinx.android.synthetic.main.fragment_change_password.*
@@ -25,7 +26,12 @@ class RegisterFragment : BaseAuthFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         Log.d(TAG, "RegisterFragment: ${viewModel.hashCode()}")
+        register_button.setOnClickListener {
+            register()
+        }
         subscribeObservers()
+
+
     }
 
     private fun subscribeObservers() {
@@ -45,6 +51,17 @@ class RegisterFragment : BaseAuthFragment() {
                 }
             }
         })
+    }
+
+    fun register() {
+        viewModel.setStateEvent(
+            AuthStateEvent.RegisterAttemptEvent(
+                input_email.toString(),
+                input_password.toString(),
+                input_password.toString(),
+                input_password_confirm.toString()
+            )
+        )
     }
 
     override fun onDestroyView() {

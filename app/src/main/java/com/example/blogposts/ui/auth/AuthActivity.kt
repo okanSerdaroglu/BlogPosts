@@ -7,6 +7,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.example.blogposts.R
 import com.example.blogposts.ui.BaseActivity
+import com.example.blogposts.ui.ResponseType.*
 import com.example.blogposts.ui.main.MainActivity
 import com.example.blogposts.viewmodels.ViewModelProviderFactory
 import javax.inject.Inject
@@ -26,6 +27,38 @@ class AuthActivity : BaseActivity() {
     }
 
     private fun subscribeObservers() {
+
+        viewModel.dataState.observe(this, Observer { dataState ->
+            dataState.data?.let { data ->
+                data.data?.let { event ->
+                    event.getContentIfNotHandled()?.let { authViewState ->
+                        authViewState.authToken?.let { authToken ->
+                            Log.d(TAG, "AuthActivity, DataState: $authToken")
+                            viewModel.setAuthToken(authToken)
+                        }
+                    }
+                }
+
+                data.response?.let { event ->
+                    event.getContentIfNotHandled()?.let { response ->
+                        when (response.responseType) {
+                            is Dialog -> {
+                                // show error dialog
+                            }
+
+                            is Toast -> {
+                                // show toast
+                            }
+
+                            is None -> {
+                                Log.e(TAG, "AuthActivity, Response: ${response.message}")
+                            }
+                        }
+                    }
+                }
+            }
+        })
+
         viewModel.viewState.observe(this, Observer { authViewState ->
             authViewState.authToken?.let { authToken ->
                 sessionManager.login(authToken)

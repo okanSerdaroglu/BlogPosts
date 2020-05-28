@@ -69,8 +69,7 @@ constructor(
 
     fun setValue(newValue: AuthToken?) {
         GlobalScope.launch(Main) {
-            if (_cachedToken.value != newValue
-                && _cachedToken.value != null) {
+            if (_cachedToken.value != newValue) {
                 _cachedToken.value = newValue
             }
         }
