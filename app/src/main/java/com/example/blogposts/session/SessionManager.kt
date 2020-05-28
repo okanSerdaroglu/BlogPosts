@@ -27,9 +27,9 @@ constructor(
 
     private val TAG: String = "AppDebug"
 
-    private val _cachedToken = MutableLiveData<AuthToken>()
+    private val _cachedToken = MutableLiveData<AuthToken?>()
 
-    val cachedToken: LiveData<AuthToken>
+    val cachedToken: LiveData<AuthToken?>
         get() = _cachedToken
 
     /**
@@ -69,8 +69,9 @@ constructor(
 
     fun setValue(newValue: AuthToken?) {
         GlobalScope.launch(Main) {
-            if (_cachedToken.value != newValue) {
-                _cachedToken.value = newValue!!
+            if (_cachedToken.value != newValue
+                && _cachedToken.value != null) {
+                _cachedToken.value = newValue
             }
         }
     }
