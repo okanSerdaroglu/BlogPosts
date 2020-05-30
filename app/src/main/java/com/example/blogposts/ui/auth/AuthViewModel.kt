@@ -12,6 +12,7 @@ import com.example.blogposts.ui.auth.state.AuthViewState
 import com.example.blogposts.ui.auth.state.LoginFields
 import com.example.blogposts.ui.auth.state.RegistrationFields
 import com.example.blogposts.utils.AbsentLiveData
+import kotlinx.coroutines.InternalCoroutinesApi
 import javax.inject.Inject
 
 class AuthViewModel
@@ -19,6 +20,7 @@ class AuthViewModel
 constructor(val authRepository: AuthRepository) : BaseViewModel<AuthStateEvent, AuthViewState>() {
 
 
+    @InternalCoroutinesApi
     override fun handleStateEvent(stateEvent: AuthStateEvent): LiveData<DataState<AuthViewState>> {
         return when (stateEvent) {
             is LoginAttemptEvent -> {
@@ -73,6 +75,16 @@ constructor(val authRepository: AuthRepository) : BaseViewModel<AuthStateEvent, 
 
     override fun initViewState(): AuthViewState {
         return AuthViewState()
+    }
+
+
+    fun cancelActiveJobs() {
+        authRepository.cancelActiveJobs()
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        cancelActiveJobs()
     }
 
 }

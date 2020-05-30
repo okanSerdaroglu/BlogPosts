@@ -22,7 +22,7 @@ abstract class NetworkBoundResource<ResponseObject, ViewStateType>(
     isNetworkAvailable: Boolean // is there a network connection
 ) {
 
-    private val TAG: String = "AppDebug"
+     val TAG: String = "AppDebug"
 
     protected val result = MediatorLiveData<DataState<ViewStateType>>()
     protected lateinit var job: CompletableJob
@@ -76,7 +76,11 @@ abstract class NetworkBoundResource<ResponseObject, ViewStateType>(
 
             is ApiErrorResponse -> {
                 Log.e(TAG, "NetworkBoundResource: ${response.errorMessage}")
-                onErrorReturn(response.errorMessage, shouldUseDialog = true, shouldUseToast = false)
+                onErrorReturn(
+                    response.errorMessage,
+                    shouldUseDialog = true,
+                    shouldUseToast = false
+                )
             }
 
             is ApiEmptyResponse -> {
