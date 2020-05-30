@@ -1,5 +1,6 @@
 package com.example.blogposts.di.auth
 
+import android.content.SharedPreferences
 import com.example.blogposts.api.auth.BlogPostsAuthService
 import com.example.blogposts.persistesnce.AccountPropertiesDao
 import com.example.blogposts.persistesnce.AuthTokenDao
@@ -25,13 +26,17 @@ class AuthModule {
         sessionManager: SessionManager,
         authTokenDao: AuthTokenDao,
         accountPropertiesDao: AccountPropertiesDao,
-        blogPostsAuthService: BlogPostsAuthService
+        blogPostsAuthService: BlogPostsAuthService,
+        sharedPreferences: SharedPreferences,
+        editor: SharedPreferences.Editor
     ): AuthRepository {
         return AuthRepository(
             authTokenDao,
             accountPropertiesDao,
             blogPostsAuthService,
-            sessionManager
+            sessionManager,
+            sharedPreferences,
+            editor
         )
     }
 

@@ -11,7 +11,6 @@ import com.example.blogposts.ui.auth.state.AuthStateEvent.*
 import com.example.blogposts.ui.auth.state.AuthViewState
 import com.example.blogposts.ui.auth.state.LoginFields
 import com.example.blogposts.ui.auth.state.RegistrationFields
-import com.example.blogposts.utils.AbsentLiveData
 import kotlinx.coroutines.InternalCoroutinesApi
 import javax.inject.Inject
 
@@ -40,7 +39,7 @@ constructor(val authRepository: AuthRepository) : BaseViewModel<AuthStateEvent, 
             }
 
             is CheckPreviousAuthEvent -> {
-                AbsentLiveData.create()
+                authRepository.checkPreviousAuthUser()
             }
 
         }
