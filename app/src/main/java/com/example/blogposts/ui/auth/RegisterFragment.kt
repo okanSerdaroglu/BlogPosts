@@ -71,7 +71,7 @@ class RegisterFragment : BaseAuthFragment() {
                 input_email.text.toString(),
                 input_username.text.toString(),
                 input_password.text.toString(),
-                input_confirm_new_password.text.toString()
+                input_password_confirm.text.toString()
             )
         )
     }

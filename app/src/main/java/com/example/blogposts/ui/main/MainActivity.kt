@@ -3,6 +3,7 @@ package com.example.blogposts.ui.main
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import androidx.lifecycle.Observer
 import com.example.blogposts.R
 import com.example.blogposts.ui.BaseActivity
@@ -10,6 +11,12 @@ import com.example.blogposts.ui.auth.AuthActivity
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : BaseActivity() {
+    override fun displayProgressBar(boolean: Boolean) {
+        if (boolean) {
+            progress_bar.visibility = View.VISIBLE
+        } else {
+            progress_bar.visibility = View.GONE
+        }    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

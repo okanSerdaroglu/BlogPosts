@@ -3,6 +3,7 @@ package com.example.blogposts.ui.auth
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
@@ -10,9 +11,9 @@ import androidx.navigation.NavDestination
 import androidx.navigation.findNavController
 import com.example.blogposts.R
 import com.example.blogposts.ui.BaseActivity
-import com.example.blogposts.ui.ResponseType.*
 import com.example.blogposts.ui.main.MainActivity
 import com.example.blogposts.viewmodels.ViewModelProviderFactory
+import kotlinx.android.synthetic.main.activity_main.*
 import javax.inject.Inject
 
 class AuthActivity : BaseActivity(), NavController.OnDestinationChangedListener {
@@ -20,6 +21,14 @@ class AuthActivity : BaseActivity(), NavController.OnDestinationChangedListener 
     @Inject
     lateinit var providerFactory: ViewModelProviderFactory
     lateinit var viewModel: AuthViewModel
+
+    override fun displayProgressBar(boolean: Boolean) {
+        if (boolean) {
+            progress_bar.visibility = View.VISIBLE
+        } else {
+            progress_bar.visibility = View.GONE
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,30 +42,13 @@ class AuthActivity : BaseActivity(), NavController.OnDestinationChangedListener 
     private fun subscribeObservers() {
 
         viewModel.dataState.observe(this, Observer { dataState ->
+            onDataStateChange(dataState)
             dataState.data?.let { data ->
                 data.data?.let { event ->
                     event.getContentIfNotHandled()?.let { authViewState ->
                         authViewState.authToken?.let { authToken ->
                             Log.d(TAG, "AuthActivity, DataState: $authToken")
                             viewModel.setAuthToken(authToken)
-                        }
-                    }
-                }
-
-                data.response?.let { event ->
-                    event.getContentIfNotHandled()?.let { response ->
-                        when (response.responseType) {
-                            is Dialog -> {
-                                // show error dialog
-                            }
-
-                            is Toast -> {
-                                // show toast
-                            }
-
-                            is None -> {
-                                Log.e(TAG, "AuthActivity, Response: ${response.message}")
-                            }
                         }
                     }
                 }
