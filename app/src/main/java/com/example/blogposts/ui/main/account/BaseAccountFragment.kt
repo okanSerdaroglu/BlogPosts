@@ -2,7 +2,7 @@ package com.example.blogposts.ui.main.account
 
 import android.content.Context
 import android.util.Log
-import com.codingwithmitch.openapi.ui.DataStateChangeListener
+import com.example.blogposts.ui.DataStateChangeListener
 import dagger.android.support.DaggerFragment
 
 abstract class BaseAccountFragment : DaggerFragment(){
