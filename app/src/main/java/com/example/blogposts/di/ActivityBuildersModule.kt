@@ -6,6 +6,7 @@ import com.example.blogposts.di.auth.AuthScope
 import com.example.blogposts.di.auth.AuthViewModelModule
 import com.example.blogposts.di.main.MainFragmentBuildersModule
 import com.example.blogposts.di.main.MainModule
+import com.example.blogposts.di.main.MainScope
 import com.example.blogposts.di.main.MainViewModelModule
 import com.example.blogposts.ui.auth.AuthActivity
 import com.example.blogposts.ui.main.MainActivity
@@ -25,6 +26,7 @@ abstract class ActivityBuildersModule {
     )
     abstract fun contributeAuthActivity(): AuthActivity
 
+    @MainScope
     @ContributesAndroidInjector(
         modules = [
             MainModule::class,
