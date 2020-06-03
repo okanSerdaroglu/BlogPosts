@@ -8,6 +8,6 @@
     <fragment
         android:id="@+id/createBlogFragment"
         android:name="com.example.blogposts.ui.main.create_blog.CreateBlogFragment"
-        android:label="CreateBlogFragment"
+        android:label="@string/fragment_create_blog"
         tools:layout="@layout/fragment_create_blog"/>
 </navigation>

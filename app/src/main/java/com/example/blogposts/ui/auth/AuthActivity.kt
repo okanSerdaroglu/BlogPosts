@@ -41,6 +41,8 @@ class AuthActivity : BaseActivity(), NavController.OnDestinationChangedListener 
 
     }
 
+
+
     private fun checkPreviousAuthUser() {
         viewModel.setStateEvent(
             event = AuthStateEvent.CheckPreviousAuthEvent()
@@ -91,6 +93,10 @@ class AuthActivity : BaseActivity(), NavController.OnDestinationChangedListener 
         arguments: Bundle?
     ) {
         viewModel.cancelActiveJobs()
+    }
+
+    override fun expandAppbar() {
+        TODO("Not yet implemented")
     }
 
 }
