@@ -116,11 +116,11 @@ constructor(
 
             override suspend fun handleApiSuccessResponse(response: ApiSuccessResponse<GenericResponse>) {
                 updateLocalDb(null)
-                withContext(Main){
+                withContext(Main) {
                     onCompleteJob(
                         DataState.data(
                             data = null,
-                            response = Response(response.body.response,ResponseType.Toast())
+                            response = Response(response.body.response, ResponseType.Toast())
                         )
                     )
                 }
@@ -151,6 +151,62 @@ constructor(
                 repositoryJob?.cancel()
                 repositoryJob = job
             }
+        }.asLiveData()
+    }
+
+    fun updatePassword(
+        authToken: AuthToken,
+        currentPassword: String,
+        newPassword: String,
+        confirmNewPassword: String
+    ): LiveData<DataState<AccountViewState>> {
+        return object : NetworkBoundResource<GenericResponse, Any, AccountViewState>(
+            sessionManager.isConnectedToInternet(),
+            isNetworkRequest = true,
+            shouldCancelIfNoInternet = true,
+            shouldLoadFromCache = false
+        ) {
+            // not applicable
+            override suspend fun createCacheRequestAndReturn() {
+            }
+
+            override suspend fun handleApiSuccessResponse(response: ApiSuccessResponse<GenericResponse>) {
+                withContext(Main) {
+                    onCompleteJob(
+                        DataState.data(
+                            data = null,
+                            response = Response(
+                                message = response.body.response,
+                                responseType = ResponseType.Toast()
+                            )
+
+                        )
+                    )
+                }
+            }
+
+            override fun createCall(): LiveData<GenericApiResponse<GenericResponse>> {
+                return blogPostsMainService.updatePassword(
+                    "Token ${authToken.token!!}",
+                    currentPassword = currentPassword,
+                    newPassword = newPassword,
+                    confirmNewPassword = confirmNewPassword
+                )
+            }
+
+            override fun loadFromCache(): LiveData<AccountViewState> {
+                return AbsentLiveData.create()
+            }
+
+            //not applicable
+            override suspend fun updateLocalDb(cacheObject: Any?) {
+            }
+
+            override fun setJob(job: Job) {
+                repositoryJob?.cancel()
+                repositoryJob = job
+            }
+
         }.asLiveData()
     }
 
