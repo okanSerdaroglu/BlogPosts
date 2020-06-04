@@ -1,6 +1,8 @@
 package com.example.blogposts.ui
 
+import android.content.Context
 import android.util.Log
+import android.view.inputmethod.InputMethodManager
 import com.example.blogposts.session.SessionManager
 import com.example.blogposts.ui.ResponseType.*
 import dagger.android.support.DaggerAppCompatActivity
@@ -82,5 +84,14 @@ abstract class BaseActivity : DaggerAppCompatActivity(),
 
 
     abstract fun displayProgressBar(boolean: Boolean)
+
+    override fun hideSoftKeyboard() {
+        if (currentFocus != null) {
+            val inputMethodManager = getSystemService(
+                Context.INPUT_METHOD_SERVICE
+            ) as InputMethodManager
+            inputMethodManager.hideSoftInputFromWindow(currentFocus!!.windowToken, 0)
+        }
+    }
 
 }
