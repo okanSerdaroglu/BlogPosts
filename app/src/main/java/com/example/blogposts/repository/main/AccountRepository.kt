@@ -3,6 +3,7 @@ package com.example.blogposts.repository.main
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.switchMap
+import com.example.blogposts.api.GenericResponse
 import com.example.blogposts.api.main.BlogPostsMainService
 import com.example.blogposts.models.AccountProperties
 import com.example.blogposts.models.AuthToken
@@ -10,11 +11,13 @@ import com.example.blogposts.persistesnce.AccountPropertiesDao
 import com.example.blogposts.repository.NetworkBoundResource
 import com.example.blogposts.session.SessionManager
 import com.example.blogposts.ui.DataState
+import com.example.blogposts.ui.Response
+import com.example.blogposts.ui.ResponseType
 import com.example.blogposts.ui.main.account.state.AccountViewState
+import com.example.blogposts.utils.AbsentLiveData
 import com.example.blogposts.utils.ApiSuccessResponse
 import com.example.blogposts.utils.GenericApiResponse
 import kotlinx.coroutines.Dispatchers.Main
-import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -35,6 +38,7 @@ constructor(
             NetworkBoundResource<AccountProperties, AccountProperties, AccountViewState>(
                 sessionManager.isConnectedToInternet(),
                 isNetworkRequest = true,
+                shouldCancelIfNoInternet = false,
                 shouldLoadFromCache = true
             ) {
             override suspend fun createCacheRequestAndReturn() {
@@ -92,6 +96,61 @@ constructor(
                 }
             }
 
+        }.asLiveData()
+    }
+
+    fun saveAccountProperties(
+        authToken: AuthToken,
+        accountProperties: AccountProperties
+    ): LiveData<DataState<AccountViewState>> {
+        return object : NetworkBoundResource<GenericResponse, Any, AccountViewState>(
+            isNetworkAvailable = sessionManager.isConnectedToInternet(),
+            isNetworkRequest = true,
+            shouldCancelIfNoInternet = true,
+            shouldLoadFromCache = false
+        ) {
+            // not used in this case
+            override suspend fun createCacheRequestAndReturn() {
+
+            }
+
+            override suspend fun handleApiSuccessResponse(response: ApiSuccessResponse<GenericResponse>) {
+                updateLocalDb(null)
+                withContext(Main){
+                    onCompleteJob(
+                        DataState.data(
+                            data = null,
+                            response = Response(response.body.response,ResponseType.Toast())
+                        )
+                    )
+                }
+            }
+
+            override fun createCall(): LiveData<GenericApiResponse<GenericResponse>> {
+                return blogPostsMainService.saveAccountProperties(
+                    "Token ${authToken.token!!}",
+                    accountProperties.email,
+                    accountProperties.username
+                )
+            }
+
+            // not used in this case
+            override fun loadFromCache(): LiveData<AccountViewState> {
+                return AbsentLiveData.create()
+            }
+
+            override suspend fun updateLocalDb(cacheObject: Any?) {
+                return accountPropertiesDao.updateAccountProperties(
+                    pk = accountProperties.pk,
+                    email = accountProperties.email,
+                    username = accountProperties.username
+                )
+            }
+
+            override fun setJob(job: Job) {
+                repositoryJob?.cancel()
+                repositoryJob = job
+            }
         }.asLiveData()
     }
 

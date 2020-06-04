@@ -53,6 +53,7 @@ constructor(
         return object : NetworkBoundResource<LoginResponse,Any, AuthViewState>(
             isNetworkAvailable = sessionManager.isConnectedToInternet(),
             isNetworkRequest = true,
+            shouldCancelIfNoInternet = true,
             shouldLoadFromCache = false
         ) {
 
@@ -154,6 +155,7 @@ constructor(
         return object : NetworkBoundResource<Void, Any,AuthViewState>(
             isNetworkAvailable = sessionManager.isConnectedToInternet(),
             isNetworkRequest = false,
+            shouldCancelIfNoInternet = false,
             shouldLoadFromCache = false
         ) {
             override suspend fun createCacheRequestAndReturn() {
@@ -256,6 +258,7 @@ constructor(
         return object : NetworkBoundResource<RegistrationResponse, Any,AuthViewState>(
             isNetworkAvailable = sessionManager.isConnectedToInternet(),
             isNetworkRequest = true,
+            shouldCancelIfNoInternet = true,
             shouldLoadFromCache = false
         ) {
 
