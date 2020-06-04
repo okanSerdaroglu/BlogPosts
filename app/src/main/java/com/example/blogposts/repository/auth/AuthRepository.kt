@@ -45,20 +45,19 @@ constructor(
     private var TAG = "AuthRepository"
     private var repositoryJob: Job? = null
 
-    @InternalCoroutinesApi
     fun attemptLogin(email: String, password: String): LiveData<DataState<AuthViewState>> {
         val loginFieldErrors = LoginFields(email, password).isValidForLogin()
         if (loginFieldErrors != LoginFields.LoginError.none()) {
             return returnErrorResponse(loginFieldErrors, ResponseType.Dialog())
         }
-        return object : NetworkBoundResource<LoginResponse, AuthViewState>(
+        return object : NetworkBoundResource<LoginResponse,Any, AuthViewState>(
             isNetworkAvailable = sessionManager.isConnectedToInternet(),
-            isNetworkRequest = true
+            isNetworkRequest = true,
+            shouldLoadFromCache = false
         ) {
 
-            override suspend fun createCacheRequestAndReturn() {
-                // not used in this case
-            }
+            // not used in this case
+            override suspend fun createCacheRequestAndReturn() {}
 
             override suspend fun handleApiSuccessResponse(response: ApiSuccessResponse<LoginResponse>) {
                 Log.d(TAG, "handle api success response:${response}")
@@ -121,6 +120,14 @@ constructor(
                 repositoryJob = job
             }
 
+            // ignore
+            override fun loadFromCache(): LiveData<AuthViewState> {
+                return AbsentLiveData.create()
+            }
+
+            // ignore
+            override suspend fun updateLocalDb(cacheObject: Any?) {}
+
 
         }.asLiveData()
     }
@@ -135,7 +142,6 @@ constructor(
         repositoryJob?.cancel()
     }
 
-    @InternalCoroutinesApi
     fun checkPreviousAuthUser(): LiveData<DataState<AuthViewState>> {
         val previousAuthUserEmail: String? =
             sharedPreferences.getString(PreferenceKeys.PREVIOUS_AUTH_USER, null)
@@ -145,9 +151,10 @@ constructor(
             return returnNoTokenFound()
         }
 
-        return object : NetworkBoundResource<Void, AuthViewState>(
+        return object : NetworkBoundResource<Void, Any,AuthViewState>(
             isNetworkAvailable = sessionManager.isConnectedToInternet(),
-            isNetworkRequest = false
+            isNetworkRequest = false,
+            shouldLoadFromCache = false
         ) {
             override suspend fun createCacheRequestAndReturn() {
                 accountPropertiesDao.searchByEmail(previousAuthUserEmail).let { accountProperties ->
@@ -182,9 +189,7 @@ constructor(
             }
 
             // not used in this case
-            override suspend fun handleApiSuccessResponse(response: ApiSuccessResponse<Void>) {
-
-            }
+            override suspend fun handleApiSuccessResponse(response: ApiSuccessResponse<Void>) {}
 
             // not used in this case
             override fun createCall(): LiveData<GenericApiResponse<Void>> {
@@ -195,6 +200,13 @@ constructor(
                 repositoryJob?.cancel()
                 repositoryJob = job
             }
+
+            override fun loadFromCache(): LiveData<AuthViewState> {
+                return AbsentLiveData.create()
+            }
+
+            // ignore
+            override suspend fun updateLocalDb(cacheObject: Any?) {}
 
         }.asLiveData()
     }
@@ -229,7 +241,6 @@ constructor(
 
     }
 
-    @InternalCoroutinesApi
     fun attemptRegistration(
         email: String,
         username: String,
@@ -242,9 +253,10 @@ constructor(
             return returnErrorResponse(registrationFieldErrors, ResponseType.Dialog())
         }
 
-        return object : NetworkBoundResource<RegistrationResponse, AuthViewState>(
+        return object : NetworkBoundResource<RegistrationResponse, Any,AuthViewState>(
             isNetworkAvailable = sessionManager.isConnectedToInternet(),
-            isNetworkRequest = true
+            isNetworkRequest = true,
+            shouldLoadFromCache = false
         ) {
 
             override suspend fun createCacheRequestAndReturn() {
@@ -317,6 +329,13 @@ constructor(
                 repositoryJob?.cancel()
                 repositoryJob = job
             }
+
+            override fun loadFromCache(): LiveData<AuthViewState> {
+                return AbsentLiveData.create()
+            }
+
+            // ignore
+            override suspend fun updateLocalDb(cacheObject: Any?) {}
 
 
         }.asLiveData()

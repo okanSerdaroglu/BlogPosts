@@ -18,10 +18,10 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
 
-@InternalCoroutinesApi
-abstract class NetworkBoundResource<ResponseObject, ViewStateType>(
+abstract class NetworkBoundResource<ResponseObject, CacheObject, ViewStateType>(
     isNetworkAvailable: Boolean, // is there a network connection
-    isNetworkRequest: Boolean // is this a network request
+    isNetworkRequest: Boolean, // is this a network request
+    shouldLoadFromCache: Boolean // should the cache data be loaded?
 ) {
 
     val TAG: String = "AppDebug"
@@ -34,6 +34,19 @@ abstract class NetworkBoundResource<ResponseObject, ViewStateType>(
     init {
         setJob(initNewJob())
         setValue(DataState.loading(isLoading = true, cachedData = null))
+
+        if (shouldLoadFromCache) {
+            val dbSource = loadFromCache()
+            result.addSource(dbSource) { viewStateType ->
+                result.removeSource(dbSource)
+                setValue(
+                    DataState.loading(
+                        isLoading = true,
+                        cachedData = viewStateType
+                    )
+                )
+            }
+        }
 
         if (isNetworkRequest) {
             if (isNetworkAvailable) {
@@ -80,7 +93,6 @@ abstract class NetworkBoundResource<ResponseObject, ViewStateType>(
 
     }
 
-    abstract suspend fun createCacheRequestAndReturn()
 
     suspend fun handleNetworkCall(response: GenericApiResponse<ResponseObject>?) {
 
@@ -151,7 +163,9 @@ abstract class NetworkBoundResource<ResponseObject, ViewStateType>(
 
     }
 
-    @InternalCoroutinesApi
+
+
+    @OptIn(InternalCoroutinesApi::class)
     private fun initNewJob(): Job {
         Log.d(TAG, "initNewJob: called...")
         job = Job()
@@ -185,9 +199,15 @@ abstract class NetworkBoundResource<ResponseObject, ViewStateType>(
 
     fun asLiveData() = result as LiveData<DataState<ViewStateType>>
 
+    abstract suspend fun createCacheRequestAndReturn()
+
     abstract suspend fun handleApiSuccessResponse(response: ApiSuccessResponse<ResponseObject>)
 
     abstract fun createCall(): LiveData<GenericApiResponse<ResponseObject>>
+
+    abstract fun loadFromCache(): LiveData<ViewStateType>
+
+    abstract suspend fun updateLocalDb(cacheObject: CacheObject?)
 
     abstract fun setJob(job: Job)
 
