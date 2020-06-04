@@ -19,7 +19,6 @@ class AuthViewModel
 constructor(val authRepository: AuthRepository) : BaseViewModel<AuthStateEvent, AuthViewState>() {
 
 
-    @InternalCoroutinesApi
     override fun handleStateEvent(stateEvent: AuthStateEvent): LiveData<DataState<AuthViewState>> {
         return when (stateEvent) {
             is LoginAttemptEvent -> {

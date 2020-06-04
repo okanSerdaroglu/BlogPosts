@@ -18,10 +18,15 @@ constructor(
     val sessionManager: SessionManager,
     val accountRepository: AccountRepository
 ) : BaseViewModel<AccountStateEvent, AccountViewState>() {
+
     override fun handleStateEvent(stateEvent: AccountStateEvent): LiveData<DataState<AccountViewState>> {
         when (stateEvent) {
             is GetAccountPropertiesEvent -> {
-                return AbsentLiveData.create()
+                return sessionManager.cachedToken.value?.let {authToken ->
+                    accountRepository.getAccountProperties(
+                        authToken = authToken
+                    )
+                }?: AbsentLiveData.create()
             }
 
             is UpdateAccountPropertiesEvent -> {
@@ -49,7 +54,7 @@ constructor(
             return
         }
 
-        update.accountProperties == accountProperties
+        update.accountProperties = accountProperties
         _viewState.value = update
 
     }
