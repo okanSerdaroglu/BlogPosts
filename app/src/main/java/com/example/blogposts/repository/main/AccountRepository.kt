@@ -1,6 +1,5 @@
 package com.example.blogposts.repository.main
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.switchMap
 import com.example.blogposts.api.GenericResponse
@@ -8,6 +7,7 @@ import com.example.blogposts.api.main.BlogPostsMainService
 import com.example.blogposts.models.AccountProperties
 import com.example.blogposts.models.AuthToken
 import com.example.blogposts.persistesnce.AccountPropertiesDao
+import com.example.blogposts.repository.JobManager
 import com.example.blogposts.repository.NetworkBoundResource
 import com.example.blogposts.session.SessionManager
 import com.example.blogposts.ui.DataState
@@ -28,10 +28,9 @@ constructor(
     val blogPostsMainService: BlogPostsMainService,
     val accountPropertiesDao: AccountPropertiesDao,
     val sessionManager: SessionManager
-) {
+) : JobManager("AccountRepository") {
     private val TAG: String = "AppDebug"
 
-    private var repositoryJob: Job? = null
 
     fun getAccountProperties(authToken: AuthToken): LiveData<DataState<AccountViewState>> {
         return object :
@@ -70,8 +69,7 @@ constructor(
             }
 
             override fun setJob(job: Job) {
-                repositoryJob?.cancel()
-                repositoryJob = job
+                addJob("getAccountProperties", job)
             }
 
             override fun loadFromCache(): LiveData<AccountViewState> {
@@ -148,8 +146,7 @@ constructor(
             }
 
             override fun setJob(job: Job) {
-                repositoryJob?.cancel()
-                repositoryJob = job
+                addJob("saveAccountProperties", job)
             }
         }.asLiveData()
     }
@@ -203,14 +200,10 @@ constructor(
             }
 
             override fun setJob(job: Job) {
-                repositoryJob?.cancel()
-                repositoryJob = job
+                addJob("updatePassword", job)
             }
 
         }.asLiveData()
     }
 
-    fun cancelActiveJobs() {
-        Log.d(TAG, "AuthRepository: cancelling on-going jobs...")
-    }
 }

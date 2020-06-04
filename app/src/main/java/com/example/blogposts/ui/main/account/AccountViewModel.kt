@@ -81,4 +81,18 @@ constructor(
         sessionManager.logOut()
     }
 
+     fun cancelActiveJobs() {
+        handlePendingData()
+        accountRepository.cancelActiveJobs()
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        cancelActiveJobs()
+    }
+
+    private fun handlePendingData(){
+        setStateEvent(None())
+    }
+
 }

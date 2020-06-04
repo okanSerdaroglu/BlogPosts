@@ -11,10 +11,13 @@ import androidx.navigation.NavController
 import com.example.blogposts.R
 import com.example.blogposts.ui.BaseActivity
 import com.example.blogposts.ui.auth.AuthActivity
+import com.example.blogposts.ui.main.account.BaseAccountFragment
 import com.example.blogposts.ui.main.account.ChangePasswordFragment
 import com.example.blogposts.ui.main.account.UpdateAccountFragment
+import com.example.blogposts.ui.main.blog.BaseBlogFragment
 import com.example.blogposts.ui.main.blog.UpdateBlogFragment
 import com.example.blogposts.ui.main.blog.ViewBlogFragment
+import com.example.blogposts.ui.main.create_blog.BaseCreateBlogFragment
 import com.example.blogposts.utils.BottomNavController
 import com.example.blogposts.utils.setUpNavigation
 import com.google.android.material.appbar.AppBarLayout
@@ -57,6 +60,24 @@ class MainActivity : BaseActivity(),
 
     override fun onGraphChange() {
         expandAppbar()
+        cancelActiveJobs()
+    }
+
+    private fun cancelActiveJobs() {
+        val fragments =
+            bottomNavController.fragmentManager.findFragmentById(bottomNavController.containerId)
+                ?.childFragmentManager
+                ?.fragments
+        if (fragments != null) {
+            for (fragment in fragments) {
+                when (fragment) {
+                    is BaseAccountFragment -> fragment.cancelActiveJobs()
+                    is BaseBlogFragment -> fragment.cancelActiveJobs()
+                    is BaseCreateBlogFragment -> fragment.cancelActiveJobs()
+                }
+            }
+        }
+        displayProgressBar(false)
     }
 
     override fun onReselectNavItem(

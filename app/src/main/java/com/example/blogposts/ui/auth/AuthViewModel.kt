@@ -11,7 +11,7 @@ import com.example.blogposts.ui.auth.state.AuthStateEvent.*
 import com.example.blogposts.ui.auth.state.AuthViewState
 import com.example.blogposts.ui.auth.state.LoginFields
 import com.example.blogposts.ui.auth.state.RegistrationFields
-import kotlinx.coroutines.InternalCoroutinesApi
+
 import javax.inject.Inject
 
 class AuthViewModel
@@ -22,14 +22,14 @@ constructor(val authRepository: AuthRepository) : BaseViewModel<AuthStateEvent, 
     override fun handleStateEvent(stateEvent: AuthStateEvent): LiveData<DataState<AuthViewState>> {
         return when (stateEvent) {
             is LoginAttemptEvent -> {
-                return authRepository.attemptLogin(
+                authRepository.attemptLogin(
                     stateEvent.email,
                     stateEvent.password
                 )
             }
 
             is RegisterAttemptEvent -> {
-                return authRepository.attemptRegistration(
+                authRepository.attemptRegistration(
                     stateEvent.email,
                     stateEvent.username,
                     stateEvent.password,
@@ -41,6 +41,17 @@ constructor(val authRepository: AuthRepository) : BaseViewModel<AuthStateEvent, 
                 authRepository.checkPreviousAuthUser()
             }
 
+            is None -> {
+                return object : LiveData<DataState<AuthViewState>>() {
+                    override fun onActive() {
+                        super.onActive()
+                        value = DataState.data(
+                            data = null,
+                            response = null
+                        )
+                    }
+                }
+            }
         }
     }
 
@@ -77,12 +88,17 @@ constructor(val authRepository: AuthRepository) : BaseViewModel<AuthStateEvent, 
 
 
     fun cancelActiveJobs() {
+        handlePendingData()
         authRepository.cancelActiveJobs()
     }
 
     override fun onCleared() {
         super.onCleared()
         cancelActiveJobs()
+    }
+
+    fun handlePendingData() {
+        setStateEvent(None())
     }
 
 }

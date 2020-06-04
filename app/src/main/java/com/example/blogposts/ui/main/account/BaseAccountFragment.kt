@@ -34,6 +34,8 @@ abstract class BaseAccountFragment : DaggerFragment() {
         viewModel = activity?.run {
             ViewModelProvider(this, providerFactory).get(AccountViewModel::class.java)
         } ?: throw Exception("invalid Activity")
+
+        cancelActiveJobs()
     }
 
     fun setUpActionBarWithNavController(fragmentId: Int, activity: AppCompatActivity) {
@@ -53,4 +55,9 @@ abstract class BaseAccountFragment : DaggerFragment() {
             Log.e(TAG, "$context must implement DataStateChangeListener")
         }
     }
+
+    fun cancelActiveJobs() {
+        viewModel.cancelActiveJobs()
+    }
+
 }

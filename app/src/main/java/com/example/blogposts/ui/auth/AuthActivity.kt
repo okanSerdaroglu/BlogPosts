@@ -37,11 +37,12 @@ class AuthActivity : BaseActivity(), NavController.OnDestinationChangedListener 
         viewModel = ViewModelProvider(this, providerFactory).get(AuthViewModel::class.java)
         findNavController(R.id.auth_fragments_container).addOnDestinationChangedListener(this)
         subscribeObservers()
-        checkPreviousAuthUser()
-
     }
 
-
+    override fun onResume() {
+        super.onResume()
+        checkPreviousAuthUser()
+    }
 
     private fun checkPreviousAuthUser() {
         viewModel.setStateEvent(

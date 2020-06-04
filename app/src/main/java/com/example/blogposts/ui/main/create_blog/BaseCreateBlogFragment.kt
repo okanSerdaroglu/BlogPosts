@@ -12,7 +12,7 @@ import com.example.blogposts.R
 import com.example.blogposts.ui.DataStateChangeListener
 import dagger.android.support.DaggerFragment
 
-abstract class BaseCreateBlogFragment : DaggerFragment(){
+abstract class BaseCreateBlogFragment : DaggerFragment() {
 
     val TAG: String = "AppDebug"
 
@@ -21,6 +21,7 @@ abstract class BaseCreateBlogFragment : DaggerFragment(){
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setUpActionBarWithNavController(R.id.createBlogFragment, activity as AppCompatActivity)
+        cancelActiveJobs()
     }
 
     fun setUpActionBarWithNavController(fragmentId: Int, activity: AppCompatActivity) {
@@ -32,12 +33,16 @@ abstract class BaseCreateBlogFragment : DaggerFragment(){
         )
     }
 
+    fun cancelActiveJobs() {
+        // viewModel.cancelActiveJobs()
+    }
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        try{
+        try {
             stateChangeListener = context as DataStateChangeListener
-        }catch(e: ClassCastException){
-            Log.e(TAG, "$context must implement DataStateChangeListener" )
+        } catch (e: ClassCastException) {
+            Log.e(TAG, "$context must implement DataStateChangeListener")
         }
     }
 }

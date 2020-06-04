@@ -8,12 +8,14 @@ sealed class AuthStateEvent {
     ) : AuthStateEvent()
 
     data class RegisterAttemptEvent(
-        val email:String,
-        val username:String,
+        val email: String,
+        val username: String,
         val password: String,
-        val confirmPassword:String
+        val confirmPassword: String
     ) : AuthStateEvent()
 
-    class CheckPreviousAuthEvent:AuthStateEvent()
+    class CheckPreviousAuthEvent : AuthStateEvent()
+
+    class None : AuthStateEvent()
 
 }

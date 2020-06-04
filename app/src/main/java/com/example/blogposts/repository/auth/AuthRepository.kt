@@ -11,6 +11,7 @@ import com.example.blogposts.models.AccountProperties
 import com.example.blogposts.models.AuthToken
 import com.example.blogposts.persistesnce.AccountPropertiesDao
 import com.example.blogposts.persistesnce.AuthTokenDao
+import com.example.blogposts.repository.JobManager
 import com.example.blogposts.repository.NetworkBoundResource
 import com.example.blogposts.session.SessionManager
 import com.example.blogposts.ui.DataState
@@ -40,17 +41,16 @@ constructor(
     val sessionManager: SessionManager,
     val sharedPreferences: SharedPreferences,
     val sharedPreferencesEditor: SharedPreferences.Editor
-) {
+) : JobManager("AuthRepository") {
 
     private var TAG = "AuthRepository"
-    private var repositoryJob: Job? = null
 
     fun attemptLogin(email: String, password: String): LiveData<DataState<AuthViewState>> {
         val loginFieldErrors = LoginFields(email, password).isValidForLogin()
         if (loginFieldErrors != LoginFields.LoginError.none()) {
             return returnErrorResponse(loginFieldErrors, ResponseType.Dialog())
         }
-        return object : NetworkBoundResource<LoginResponse,Any, AuthViewState>(
+        return object : NetworkBoundResource<LoginResponse, Any, AuthViewState>(
             isNetworkAvailable = sessionManager.isConnectedToInternet(),
             isNetworkRequest = true,
             shouldCancelIfNoInternet = true,
@@ -117,8 +117,7 @@ constructor(
             }
 
             override fun setJob(job: Job) {
-                repositoryJob?.cancel()
-                repositoryJob = job
+                addJob("attemptLogin", job)
             }
 
             // ignore
@@ -138,10 +137,6 @@ constructor(
         sharedPreferencesEditor.apply()
     }
 
-    fun cancelActiveJobs() {
-        Log.d(TAG, "AuthRepository: Cancelling on going jobs...")
-        repositoryJob?.cancel()
-    }
 
     fun checkPreviousAuthUser(): LiveData<DataState<AuthViewState>> {
         val previousAuthUserEmail: String? =
@@ -152,7 +147,7 @@ constructor(
             return returnNoTokenFound()
         }
 
-        return object : NetworkBoundResource<Void, Any,AuthViewState>(
+        return object : NetworkBoundResource<Void, Any, AuthViewState>(
             isNetworkAvailable = sessionManager.isConnectedToInternet(),
             isNetworkRequest = false,
             shouldCancelIfNoInternet = false,
@@ -199,8 +194,7 @@ constructor(
             }
 
             override fun setJob(job: Job) {
-                repositoryJob?.cancel()
-                repositoryJob = job
+               addJob("checkPreviousAuthUser",job)
             }
 
             override fun loadFromCache(): LiveData<AuthViewState> {
@@ -255,7 +249,7 @@ constructor(
             return returnErrorResponse(registrationFieldErrors, ResponseType.Dialog())
         }
 
-        return object : NetworkBoundResource<RegistrationResponse, Any,AuthViewState>(
+        return object : NetworkBoundResource<RegistrationResponse, Any, AuthViewState>(
             isNetworkAvailable = sessionManager.isConnectedToInternet(),
             isNetworkRequest = true,
             shouldCancelIfNoInternet = true,
@@ -329,8 +323,7 @@ constructor(
             }
 
             override fun setJob(job: Job) {
-                repositoryJob?.cancel()
-                repositoryJob = job
+               addJob("attemptRegistration",job)
             }
 
             override fun loadFromCache(): LiveData<AuthViewState> {
