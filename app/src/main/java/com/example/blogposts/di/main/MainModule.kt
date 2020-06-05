@@ -2,7 +2,10 @@ package com.example.blogposts.di.main
 
 import com.example.blogposts.api.main.BlogPostsMainService
 import com.example.blogposts.persistesnce.AccountPropertiesDao
+import com.example.blogposts.persistesnce.AppDatabase
+import com.example.blogposts.persistesnce.BlogPostDao
 import com.example.blogposts.repository.main.AccountRepository
+import com.example.blogposts.repository.main.BlogRepository
 import com.example.blogposts.session.SessionManager
 import dagger.Module
 import dagger.Provides
@@ -34,5 +37,26 @@ class MainModule {
             sessionManager = sessionManager
         )
     }
+
+    @MainScope
+    @Provides
+    fun provideBLogPostDao(db: AppDatabase): BlogPostDao {
+        return db.getBlogPostDao()
+    }
+
+    @MainScope
+    @Provides
+    fun provideBlogRepository(
+        blogPostsMainService: BlogPostsMainService,
+        blogPostDao: BlogPostDao,
+        sessionManager: SessionManager
+    ): BlogRepository {
+        return BlogRepository(
+            blogPostsMainService = blogPostsMainService,
+            blogPostDao = blogPostDao,
+            sessionManager = sessionManager
+        )
+    }
+
 
 }
