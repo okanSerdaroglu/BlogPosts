@@ -14,7 +14,7 @@ import com.example.blogposts.session.SessionManager
 import com.example.blogposts.ui.DataState
 import com.example.blogposts.ui.main.blog.state.BlogViewState
 import com.example.blogposts.utils.ApiSuccessResponse
-import com.example.blogposts.utils.DateUtils
+import com.example.blogposts.utils.DateUtil
 import com.example.blogposts.utils.GenericApiResponse
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
@@ -66,7 +66,7 @@ constructor(
                             slug = blogPostResponse.slug,
                             body = blogPostResponse.body,
                             image = blogPostResponse.image,
-                            date_updated = DateUtils.convertServerStringDateToLong(
+                            date_updated = DateUtil.convertServerStringDateToLong(
                                 blogPostResponse.date_updated
                             ),
                             username = blogPostResponse.username

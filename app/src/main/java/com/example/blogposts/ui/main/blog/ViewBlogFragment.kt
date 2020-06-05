@@ -3,7 +3,9 @@ package com.example.blogposts.ui.main.blog
 import android.os.Bundle
 import android.view.*
 import androidx.navigation.fragment.findNavController
+
 import com.example.blogposts.R
+
 
 class ViewBlogFragment : BaseBlogFragment() {
 
@@ -50,5 +52,6 @@ class ViewBlogFragment : BaseBlogFragment() {
     fun navUpdateBlogFragment() {
         findNavController().navigate(R.id.action_viewBlogFragment_to_updateBlogFragment)
     }
+
 
 }
