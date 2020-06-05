@@ -1,10 +1,13 @@
 package com.example.blogposts.ui.main.blog
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.Observer
 import com.example.blogposts.R
+import com.example.blogposts.ui.main.blog.state.BlogStateEvent.BlogSearchEvent
 
 class BlogFragment : BaseBlogFragment() {
 
@@ -20,5 +23,36 @@ class BlogFragment : BaseBlogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setHasOptionsMenu(true)
+        subscribeObservers()
+        executeSearch()
     }
+
+    private fun executeSearch() {
+        viewModel.setQuery("")
+        viewModel.setStateEvent(
+            event = BlogSearchEvent()
+        )
+    }
+
+    private fun subscribeObservers() {
+        viewModel.dataState.observe(viewLifecycleOwner, Observer { dataState ->
+            if (dataState != null) {
+                stateChangeListener.onDataStateChange(dataState)
+                dataState.data?.let {
+                    it.data?.let { event ->
+                        event.getContentIfNotHandled()?.let { blogViewState ->
+                            Log.d(TAG, "BlogFragment, dataState: $blogViewState ")
+                            viewModel.setBlogListData(blogViewState.blogFields.blogList)
+                        }
+                    }
+                }
+            }
+        })
+
+        viewModel.viewState.observe(viewLifecycleOwner, Observer { viewState ->
+            Log.d(TAG, "BlogFragment,ViewState: $viewState")
+        })
+
+    }
+
 }
