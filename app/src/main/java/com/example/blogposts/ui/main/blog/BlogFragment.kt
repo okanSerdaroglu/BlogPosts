@@ -12,6 +12,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.blogposts.R
 import com.example.blogposts.models.BlogPost
 import com.example.blogposts.ui.main.blog.state.BlogStateEvent.BlogSearchEvent
+import com.example.blogposts.ui.main.blog.viewmodel.setBlogListData
+import com.example.blogposts.ui.main.blog.viewmodel.setBlogPost
+import com.example.blogposts.ui.main.blog.viewmodel.setQuery
 import com.example.blogposts.utils.TopSpacingItemDecoration
 import kotlinx.android.synthetic.main.fragment_blog.*
 
