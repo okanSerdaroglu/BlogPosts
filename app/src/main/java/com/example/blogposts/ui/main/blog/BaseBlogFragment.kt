@@ -10,6 +10,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI
+import com.bumptech.glide.RequestManager
 import com.example.blogposts.R
 import com.example.blogposts.ui.DataStateChangeListener
 import com.example.blogposts.viewmodels.ViewModelProviderFactory
@@ -22,6 +23,9 @@ abstract class BaseBlogFragment : DaggerFragment() {
 
     @Inject
     lateinit var providerFactory: ViewModelProviderFactory
+
+    @Inject
+    lateinit var requestManager: RequestManager
 
     lateinit var viewModel: BlogViewModel
 
@@ -48,7 +52,7 @@ abstract class BaseBlogFragment : DaggerFragment() {
     }
 
     fun cancelActiveJobs() {
-          viewModel.cancelActiveJobs()
+        viewModel.cancelActiveJobs()
     }
 
     override fun onAttach(context: Context) {

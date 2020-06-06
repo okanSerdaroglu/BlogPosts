@@ -9,8 +9,7 @@ import com.example.blogposts.session.SessionManager
 import com.example.blogposts.ui.BaseViewModel
 import com.example.blogposts.ui.DataState
 import com.example.blogposts.ui.main.blog.state.BlogStateEvent
-import com.example.blogposts.ui.main.blog.state.BlogStateEvent.BlogSearchEvent
-import com.example.blogposts.ui.main.blog.state.BlogStateEvent.None
+import com.example.blogposts.ui.main.blog.state.BlogStateEvent.*
 import com.example.blogposts.ui.main.blog.state.BlogViewState
 import com.example.blogposts.utils.AbsentLiveData
 import javax.inject.Inject
@@ -33,6 +32,10 @@ constructor(
                         viewState.value!!.blogFields.searchQuery
                     )
                 } ?: AbsentLiveData.create()
+            }
+
+            is CheckAuthorBlogPostsEvent -> {
+                AbsentLiveData.create()
             }
 
             is None -> {
@@ -71,6 +74,18 @@ constructor(
     override fun onCleared() {
         super.onCleared()
         cancelActiveJobs()
+    }
+
+    fun setBlogPost(blogPost:BlogPost){
+        val update = getCurrentViewStateOrNew()
+        update.viewBlogFields.blogPost = blogPost
+        _viewState.value = update
+    }
+
+    fun setIsAuthorOfBlogPost(isAuthorOfBlogPost:Boolean){
+        val update = getCurrentViewStateOrNew()
+        update.viewBlogFields.isAuthorOfBLogPost = isAuthorOfBlogPost
+        _viewState.value = update
     }
 
 }
