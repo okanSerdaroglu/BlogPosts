@@ -6,11 +6,13 @@ import com.example.blogposts.models.AuthToken
 import com.example.blogposts.repository.auth.AuthRepository
 import com.example.blogposts.ui.BaseViewModel
 import com.example.blogposts.ui.DataState
+import com.example.blogposts.ui.Loading
 import com.example.blogposts.ui.auth.state.AuthStateEvent
 import com.example.blogposts.ui.auth.state.AuthStateEvent.*
 import com.example.blogposts.ui.auth.state.AuthViewState
 import com.example.blogposts.ui.auth.state.LoginFields
 import com.example.blogposts.ui.auth.state.RegistrationFields
+
 
 import javax.inject.Inject
 
@@ -45,9 +47,10 @@ constructor(val authRepository: AuthRepository) : BaseViewModel<AuthStateEvent, 
                 return object : LiveData<DataState<AuthViewState>>() {
                     override fun onActive() {
                         super.onActive()
-                        value = DataState.data(
-                            data = null,
-                            response = null
+                        value = DataState(
+                            error = null,
+                            loading = Loading(false),
+                            data = null
                         )
                     }
                 }
@@ -61,7 +64,7 @@ constructor(val authRepository: AuthRepository) : BaseViewModel<AuthStateEvent, 
             return
         }
         update.registrationFields = registrationFields
-        _viewState.value = update
+        setViewState(update)
     }
 
     fun setLoginFields(loginFields: LoginFields) {
@@ -70,7 +73,7 @@ constructor(val authRepository: AuthRepository) : BaseViewModel<AuthStateEvent, 
             return
         }
         update.loginFields = loginFields
-        _viewState.value = update
+        setViewState(update)
     }
 
     fun setAuthToken(authToken: AuthToken) {
@@ -79,7 +82,7 @@ constructor(val authRepository: AuthRepository) : BaseViewModel<AuthStateEvent, 
             return
         }
         update.authToken = authToken
-        _viewState.value = update
+        setViewState(update)
     }
 
     override fun initViewState(): AuthViewState {

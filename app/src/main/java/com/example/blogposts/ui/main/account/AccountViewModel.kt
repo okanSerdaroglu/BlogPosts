@@ -6,6 +6,7 @@ import com.example.blogposts.repository.main.AccountRepository
 import com.example.blogposts.session.SessionManager
 import com.example.blogposts.ui.BaseViewModel
 import com.example.blogposts.ui.DataState
+import com.example.blogposts.ui.Loading
 import com.example.blogposts.ui.main.account.state.AccountStateEvent
 import com.example.blogposts.ui.main.account.state.AccountStateEvent.*
 import com.example.blogposts.ui.main.account.state.AccountViewState
@@ -56,9 +57,17 @@ constructor(
             }
 
             is None -> {
-                return AbsentLiveData.create()
+                return object : LiveData<DataState<AccountViewState>>() {
+                    override fun onActive() {
+                        super.onActive()
+                        value = DataState(
+                            error = null,
+                            loading = Loading(false),
+                            data = null
+                        )
+                    }
+                }
             }
-
         }
     }
 
@@ -73,7 +82,8 @@ constructor(
         }
 
         update.accountProperties = accountProperties
-        _viewState.value = update
+        setViewState(update)
+
 
     }
 
@@ -81,7 +91,7 @@ constructor(
         sessionManager.logOut()
     }
 
-     fun cancelActiveJobs() {
+    fun cancelActiveJobs() {
         handlePendingData()
         accountRepository.cancelActiveJobs()
     }
@@ -91,7 +101,7 @@ constructor(
         cancelActiveJobs()
     }
 
-    private fun handlePendingData(){
+    private fun handlePendingData() {
         setStateEvent(None())
     }
 

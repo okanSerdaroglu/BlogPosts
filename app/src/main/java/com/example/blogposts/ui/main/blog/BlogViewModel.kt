@@ -7,6 +7,7 @@ import com.example.blogposts.repository.main.BlogRepository
 import com.example.blogposts.session.SessionManager
 import com.example.blogposts.ui.BaseViewModel
 import com.example.blogposts.ui.DataState
+import com.example.blogposts.ui.Loading
 import com.example.blogposts.ui.main.blog.state.BlogStateEvent
 import com.example.blogposts.ui.main.blog.state.BlogStateEvent.*
 import com.example.blogposts.ui.main.blog.state.BlogViewState
@@ -41,9 +42,17 @@ constructor(
             }
 
             is None -> {
-                AbsentLiveData.create()
+                return object : LiveData<DataState<BlogViewState>>() {
+                    override fun onActive() {
+                        super.onActive()
+                        value = DataState(
+                            error = null,
+                            loading = Loading(false),
+                            data = null
+                        )
+                    }
+                }
             }
-
         }
     }
 
@@ -65,7 +74,6 @@ constructor(
         super.onCleared()
         cancelActiveJobs()
     }
-
 
 
 }

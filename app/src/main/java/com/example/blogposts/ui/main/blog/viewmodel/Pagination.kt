@@ -3,6 +3,7 @@ package com.example.blogposts.ui.main.blog.viewmodel
 import android.util.Log
 import com.example.blogposts.ui.main.blog.BlogViewModel
 import com.example.blogposts.ui.main.blog.state.BlogStateEvent.*
+import com.example.blogposts.ui.main.blog.state.BlogViewState
 
 fun BlogViewModel.resetPage() {
     val update = getCurrentViewStateOrNew()
@@ -33,4 +34,10 @@ fun BlogViewModel.nextPage() {
         setQueryInProgress(true)
         setStateEvent(BlogSearchEvent())
     }
+}
+
+fun BlogViewModel.handleIncomingBlogListData(viewState: BlogViewState) {
+    setQueryExhausted(viewState.blogFields.isQueryExhausted)
+    setQueryInProgress(viewState.blogFields.isQueryInProgress)
+    setBlogListData(viewState.blogFields.blogList)
 }
