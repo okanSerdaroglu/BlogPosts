@@ -127,7 +127,7 @@ class BlogListAdapter(
         if (isQueryExhausted) {
             newList?.add(NO_MORE_RESULTS_BLOG_MARKER)
         }
-        differ.submitList(list)
+        differ.submitList(newList)
     }
 
     class BlogViewHolder
