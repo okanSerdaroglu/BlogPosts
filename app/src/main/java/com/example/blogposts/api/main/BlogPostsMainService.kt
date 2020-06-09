@@ -46,7 +46,7 @@ interface BlogPostsMainService {
     ): LiveData<GenericApiResponse<GenericResponse>>
 
 
-    @GET("blog/{slug}/delete")
+    @DELETE("blog/{slug}/delete")
     fun deleteBlogPost(
         @Header("Authorization") authorization: String,
         @Path("slug") slug: String
