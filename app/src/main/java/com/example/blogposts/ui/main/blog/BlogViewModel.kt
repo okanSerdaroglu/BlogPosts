@@ -2,7 +2,7 @@ package com.example.blogposts.ui.main.blog
 
 import android.content.SharedPreferences
 import androidx.lifecycle.LiveData
-import com.bumptech.glide.RequestManager
+import com.example.blogposts.persistesnce.BlogQueryUtils
 import com.example.blogposts.repository.main.BlogRepository
 import com.example.blogposts.session.SessionManager
 import com.example.blogposts.ui.BaseViewModel
@@ -11,9 +11,10 @@ import com.example.blogposts.ui.Loading
 import com.example.blogposts.ui.main.blog.state.BlogStateEvent
 import com.example.blogposts.ui.main.blog.state.BlogStateEvent.*
 import com.example.blogposts.ui.main.blog.state.BlogViewState
-import com.example.blogposts.ui.main.blog.viewmodel.getPage
-import com.example.blogposts.ui.main.blog.viewmodel.getSearchQuery
+import com.example.blogposts.ui.main.blog.viewmodel.*
 import com.example.blogposts.utils.AbsentLiveData
+import com.example.blogposts.utils.PreferenceKeys.Companion.BLOG_FILTER
+import com.example.blogposts.utils.PreferenceKeys.Companion.BLOG_ORDER
 import javax.inject.Inject
 
 class BlogViewModel
@@ -22,8 +23,23 @@ constructor(
     private val sessionManager: SessionManager,
     private val blogRepository: BlogRepository,
     private val sharedPreferences: SharedPreferences,
-    private val requestManager: RequestManager
+    private val editor: SharedPreferences.Editor
 ) : BaseViewModel<BlogStateEvent, BlogViewState>() {
+
+    init {
+        setBlogFilter(
+            sharedPreferences.getString(
+                BLOG_FILTER,
+                BlogQueryUtils.BLOG_FILTER_DATE_UPDATED
+            )
+        )
+        setBlogOrder(
+            sharedPreferences.getString(
+                BLOG_ORDER,
+                BlogQueryUtils.BLOG_ORDER_ASC
+            )!!
+        )
+    }
 
     override fun handleStateEvent(stateEvent: BlogStateEvent): LiveData<DataState<BlogViewState>> {
         return when (stateEvent) {
@@ -32,6 +48,7 @@ constructor(
                     blogRepository.searchBlogPosts(
                         authToken = authToken,
                         query = getSearchQuery(),
+                        filterAndOrder = getOrder() + getFilter(),
                         page = getPage()
                     )
                 } ?: AbsentLiveData.create()
@@ -60,6 +77,12 @@ constructor(
         return BlogViewState()
     }
 
+    fun saveFilterOptions(filter: String, order: String) {
+        editor.putString(BLOG_FILTER, filter)
+        editor.apply()
+        editor.putString(BLOG_ORDER, order)
+        editor.apply()
+    }
 
     fun cancelActiveJobs() {
         blogRepository.cancelActiveJobs()

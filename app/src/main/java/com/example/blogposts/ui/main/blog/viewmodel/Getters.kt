@@ -2,6 +2,18 @@ package com.example.blogposts.ui.main.blog.viewmodel
 
 import com.example.blogposts.ui.main.blog.BlogViewModel
 
+fun BlogViewModel.getFilter(): String {
+    getCurrentViewStateOrNew().let {
+        return it.blogFields.filter
+    }
+}
+
+fun BlogViewModel.getOrder(): String {
+    getCurrentViewStateOrNew().let {
+        return it.blogFields.order
+    }
+}
+
 fun BlogViewModel.getSearchQuery(): String {
     getCurrentViewStateOrNew().let {
         return it.blogFields.searchQuery
