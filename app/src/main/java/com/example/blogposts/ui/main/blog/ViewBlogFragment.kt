@@ -30,6 +30,7 @@ class ViewBlogFragment : BaseBlogFragment() {
         super.onViewCreated(view, savedInstanceState)
         setHasOptionsMenu(true)
         subscribeObservers()
+        checkAuthorOfBlogPost()
         stateChangeListener.expandAppbar()
         delete_button.setOnClickListener {
             deleteBlogPost()

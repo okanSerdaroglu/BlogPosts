@@ -26,7 +26,6 @@ import com.example.blogposts.persistesnce.BlogQueryUtils.Companion.BLOG_FILTER_D
 import com.example.blogposts.persistesnce.BlogQueryUtils.Companion.BLOG_FILTER_USERNAME
 import com.example.blogposts.persistesnce.BlogQueryUtils.Companion.BLOG_ORDER_ASC
 import com.example.blogposts.ui.DataState
-import com.example.blogposts.ui.main.blog.state.BlogStateEvent.BlogSearchEvent
 import com.example.blogposts.ui.main.blog.state.BlogViewState
 import com.example.blogposts.ui.main.blog.viewmodel.*
 import com.example.blogposts.utils.ErrorHandling
@@ -55,16 +54,10 @@ class BlogFragment : BaseBlogFragment(), BlogListAdapter.Interaction,
         initRecyclerView()
         subscribeObservers()
         if (savedInstanceState == null) {
-            viewModel.loadFirstPage()
+            onBLogSearchOrFilter()
         }
     }
 
-    private fun executeSearch() {
-        viewModel.setQuery("")
-        viewModel.setStateEvent(
-            event = BlogSearchEvent()
-        )
-    }
 
     private fun onBLogSearchOrFilter() {
         viewModel.loadFirstPage().let {
