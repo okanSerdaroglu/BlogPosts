@@ -37,3 +37,18 @@ fun BlogViewModel.getIsQueryInProgress(): Boolean {
         return it.blogFields.isQueryInProgress
     }
 }
+
+fun BlogViewModel.getSlug(): String {
+    getCurrentViewStateOrNew().let {
+        it.viewBlogFields.blogPost?.let { blogPost ->
+            return blogPost.slug
+        }
+    }
+    return ""
+}
+
+fun BlogViewModel.isAuthorOfBlogPost(): Boolean {
+    getCurrentViewStateOrNew().let {
+        return it.viewBlogFields.isAuthorOfBLogPost
+    }
+}

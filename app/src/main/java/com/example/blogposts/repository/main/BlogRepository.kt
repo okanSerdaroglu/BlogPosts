@@ -3,6 +3,7 @@ package com.example.blogposts.repository.main
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.switchMap
+import com.example.blogposts.api.GenericResponse
 import com.example.blogposts.api.main.BlogPostsMainService
 import com.example.blogposts.api.main.responses.BlogListSearchResponse
 import com.example.blogposts.models.AuthToken
@@ -14,10 +15,12 @@ import com.example.blogposts.repository.NetworkBoundResource
 import com.example.blogposts.session.SessionManager
 import com.example.blogposts.ui.DataState
 import com.example.blogposts.ui.main.blog.state.BlogViewState
+import com.example.blogposts.ui.main.blog.state.BlogViewState.*
 import com.example.blogposts.utils.ApiSuccessResponse
 import com.example.blogposts.utils.Constants
 import com.example.blogposts.utils.DateUtil
 import com.example.blogposts.utils.GenericApiResponse
+import com.example.blogposts.utils.SuccessHandling.Companion.RESPONSE_NO_PERMISSION_TO_EDIT
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.Job
@@ -105,7 +108,7 @@ constructor(
                             override fun onActive() {
                                 super.onActive()
                                 value = BlogViewState(
-                                    BlogViewState.BlogFields(
+                                    BlogFields(
                                         blogList = blogList,
                                         isQueryInProgress = true
                                     )
@@ -144,5 +147,62 @@ constructor(
         }.asLiveData()
     }
 
+    fun isAuthorOfBlogPost(
+        authToken: AuthToken,
+        slug: String
+    ): LiveData<DataState<BlogViewState>> {
+        return object : NetworkBoundResource<GenericResponse, Any, BlogViewState>(
+            isNetworkAvailable = sessionManager.isConnectedToInternet(),
+            isNetworkRequest = true,
+            shouldCancelIfNoInternet = true,
+            shouldLoadFromCache = false
+        ) {
+
+            // not applicable
+            override suspend fun createCacheRequestAndReturn() {
+
+            }
+
+            override suspend fun handleApiSuccessResponse(response: ApiSuccessResponse<GenericResponse>) {
+                withContext(Main) {
+                    Log.d(TAG, "handleApiSuccessResponse: ${response.body.response}")
+                    val isAuthor = response.body.response == RESPONSE_NO_PERMISSION_TO_EDIT
+                    onCompleteJob(
+                        DataState.data(
+                            data = BlogViewState(
+                                viewBlogFields = ViewBlogFields(
+                                    isAuthorOfBLogPost = isAuthor
+                                )
+                            ),
+                            response = null
+                        )
+                    )
+                }
+            }
+
+            override fun createCall(): LiveData<GenericApiResponse<GenericResponse>> {
+                return blogPostsMainService.isAuthorOfBlogPost(
+                    authorization = "Token ${authToken.token}",
+                    slug = slug
+                )
+            }
+
+            // not applicable
+            override fun loadFromCache(): LiveData<BlogViewState> {
+                TODO("Not yet implemented")
+            }
+
+            // not applicable
+            override suspend fun updateLocalDb(cacheObject: Any?) {
+
+            }
+
+            override fun setJob(job: Job) {
+                addJob("isAuthorOfBlogPost", job)
+            }
+
+        }.asLiveData()
+
+    }
 
 }
