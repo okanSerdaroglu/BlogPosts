@@ -1,10 +1,7 @@
 package com.example.blogposts.persistesnce
 
 import androidx.lifecycle.LiveData
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.*
 import com.example.blogposts.models.BlogPost
 import com.example.blogposts.utils.Constants.Companion.PAGINATION_PAGE_SIZE
 
@@ -87,4 +84,8 @@ interface BlogPostDao {
         page: Int,
         pageSize: Int = PAGINATION_PAGE_SIZE
     ): LiveData<List<BlogPost>>
+
+    @Delete
+    suspend fun deleteBlogPost(blogPost: BlogPost)
+
 }

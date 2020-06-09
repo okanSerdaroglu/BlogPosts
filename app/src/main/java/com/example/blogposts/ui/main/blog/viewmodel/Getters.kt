@@ -1,5 +1,6 @@
 package com.example.blogposts.ui.main.blog.viewmodel
 
+import com.example.blogposts.models.BlogPost
 import com.example.blogposts.ui.main.blog.BlogViewModel
 
 fun BlogViewModel.getFilter(): String {
@@ -51,4 +52,24 @@ fun BlogViewModel.isAuthorOfBlogPost(): Boolean {
     getCurrentViewStateOrNew().let {
         return it.viewBlogFields.isAuthorOfBLogPost
     }
+}
+
+fun BlogViewModel.getBlogPost(): BlogPost {
+    getCurrentViewStateOrNew()?.let {
+        return it.viewBlogFields.blogPost?.let {
+            return it
+        } ?: getDummyBlogPost()
+    }
+}
+
+fun BlogViewModel.getDummyBlogPost(): BlogPost {
+    return BlogPost(
+        pk = -1,
+        title = "",
+        slug = "",
+        body = "",
+        image = "",
+        date_updated = 1,
+        username = ""
+    )
 }
