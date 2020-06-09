@@ -251,10 +251,10 @@ class BlogFragment : BaseBlogFragment(), BlogListAdapter.Interaction,
             }
 
             val order = viewModel.getOrder()
-            if (filter == BLOG_ORDER_ASC) {
-                view.findViewById<RadioGroup>(R.id.filter_group).check(R.id.filter_asc)
+            if (order == BLOG_ORDER_ASC) {
+                view.findViewById<RadioGroup>(R.id.order_group).check(R.id.filter_asc)
             } else {
-                view.findViewById<RadioGroup>(R.id.filter_group).check(R.id.filter_desc)
+                view.findViewById<RadioGroup>(R.id.order_group).check(R.id.filter_desc)
             }
 
             // 2) listen for new applied filters
