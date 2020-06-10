@@ -1,7 +1,9 @@
 package com.example.blogposts.ui.main.blog
 
 import android.os.Bundle
+import android.util.Log
 import android.view.*
+import androidx.core.net.toUri
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 
@@ -12,9 +14,7 @@ import com.example.blogposts.ui.UIMessage
 import com.example.blogposts.ui.UIMessageType
 import com.example.blogposts.ui.main.blog.state.BlogStateEvent
 import com.example.blogposts.ui.main.blog.state.BlogStateEvent.CheckAuthorBlogPostsEvent
-import com.example.blogposts.ui.main.blog.viewmodel.isAuthorOfBlogPost
-import com.example.blogposts.ui.main.blog.viewmodel.removeDeletedBlogPost
-import com.example.blogposts.ui.main.blog.viewmodel.setIsAuthorOfBlogPost
+import com.example.blogposts.ui.main.blog.viewmodel.*
 import com.example.blogposts.utils.DateUtil
 import com.example.blogposts.utils.SuccessHandling.Companion.SUCCESS_BLOG_DELETED
 import kotlinx.android.synthetic.main.fragment_view_blog.*
@@ -141,7 +141,16 @@ class ViewBlogFragment : BaseBlogFragment() {
     }
 
     private fun navUpdateBlogFragment() {
-        findNavController().navigate(R.id.action_viewBlogFragment_to_updateBlogFragment)
+        try {
+            viewModel.setUpdatedBlogFields(
+                title = viewModel.getBlogPost().title,
+                body = viewModel.getBlogPost().body,
+                uri = viewModel.getBlogPost().image.toUri()
+            )
+            findNavController().navigate(R.id.action_viewBlogFragment_to_updateBlogFragment)
+        } catch (e: Exception) {
+            Log.e(TAG, "Exception:${e.message}")
+        }
     }
 
 

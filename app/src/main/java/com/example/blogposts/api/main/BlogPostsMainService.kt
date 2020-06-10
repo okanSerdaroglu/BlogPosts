@@ -2,9 +2,12 @@ package com.example.blogposts.api.main
 
 import androidx.lifecycle.LiveData
 import com.example.blogposts.api.GenericResponse
+import com.example.blogposts.api.main.responses.BlogCreateUpdateResponse
 import com.example.blogposts.api.main.responses.BlogListSearchResponse
 import com.example.blogposts.models.AccountProperties
 import com.example.blogposts.utils.GenericApiResponse
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import retrofit2.http.*
 
 interface BlogPostsMainService {
@@ -52,5 +55,15 @@ interface BlogPostsMainService {
         @Path("slug") slug: String
     ): LiveData<GenericApiResponse<GenericResponse>>
 
+
+    @Multipart // uploading images
+    @PUT("blog/{slug}/update")
+    fun updateBlog(
+        @Header("Authorization") authorization: String,
+        @Part("slug") slug: String,
+        @Part("title") title: RequestBody,
+        @Part("body") body: RequestBody,
+        @Part image: MultipartBody.Part?
+    ): LiveData<GenericApiResponse<BlogCreateUpdateResponse>>
 
 }

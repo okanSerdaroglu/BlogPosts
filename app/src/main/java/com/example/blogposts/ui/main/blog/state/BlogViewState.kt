@@ -1,5 +1,6 @@
 package com.example.blogposts.ui.main.blog.state
 
+import android.net.Uri
 import com.example.blogposts.models.BlogPost
 import com.example.blogposts.persistesnce.BlogQueryUtils.Companion.BLOG_ORDER_ASC
 import com.example.blogposts.persistesnce.BlogQueryUtils.Companion.ORDER_BY_ASC_DATE_UPDATED
@@ -10,14 +11,15 @@ data class BlogViewState(
     var blogFields: BlogFields = BlogFields(),
 
     // ViewBlogFragment vars
-    var viewBlogFields: ViewBlogFields = ViewBlogFields()
+    var viewBlogFields: ViewBlogFields = ViewBlogFields(),
 
     // UpdateBlogFragment vars
+    var updateBlogFields: UpdateBlogFields = UpdateBlogFields()
 
 ) {
 
     data class BlogFields(
-        var blogList: List<BlogPost> = ArrayList<BlogPost>(),
+        var blogList: List<BlogPost> = ArrayList(),
         var searchQuery: String = "",
         var page: Int = 1,
         var isQueryInProgress: Boolean = false,
@@ -30,5 +32,12 @@ data class BlogViewState(
         var blogPost: BlogPost? = null,
         var isAuthorOfBLogPost: Boolean = false
     )
+
+    data class UpdateBlogFields(
+        var updatedBlogTitle: String? = null,
+        var updatedBlogBody: String? = null,
+        var updatedImageUri: Uri? = null
+    )
+
 
 }
