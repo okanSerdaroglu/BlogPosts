@@ -72,6 +72,7 @@ class BlogFragment : BaseBlogFragment(), BlogListAdapter.Interaction,
     }
 
     private fun subscribeObservers() {
+
         viewModel.dataState.observe(viewLifecycleOwner, Observer { dataState ->
             if (dataState != null) {
                 handlePagination(dataState)
@@ -83,10 +84,18 @@ class BlogFragment : BaseBlogFragment(), BlogListAdapter.Interaction,
         viewModel.viewState.observe(viewLifecycleOwner, Observer { viewState ->
             Log.d(TAG, "BlogFragment,ViewState: $viewState")
             if (viewState != null) {
-                recyclerAdapter.submitList(
-                    list = viewState.blogFields.blogList,
-                    isQueryExhausted = viewState.blogFields.isQueryExhausted
-                )
+
+                recyclerAdapter.apply {
+                    preLoadGlideImages(
+                        requestManager,
+                        viewState.blogFields.blogList
+                    )
+
+                    submitList(
+                        list = viewState.blogFields.blogList,
+                        isQueryExhausted = viewState.blogFields.isQueryExhausted
+                    )
+                }
             }
         })
 

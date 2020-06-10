@@ -10,7 +10,10 @@ import com.example.blogposts.R
 import com.example.blogposts.models.BlogPost
 import com.example.blogposts.utils.DateUtil
 import com.example.blogposts.utils.GenericViewHolder
+import kotlinx.android.synthetic.main.fragment_update_blog.view.*
 import kotlinx.android.synthetic.main.fragment_view_blog.view.*
+import kotlinx.android.synthetic.main.fragment_view_blog.view.blog_image
+import kotlinx.android.synthetic.main.fragment_view_blog.view.blog_title
 
 class BlogListAdapter(
     private val interaction: Interaction? = null,
@@ -128,6 +131,19 @@ class BlogListAdapter(
             newList?.add(NO_MORE_RESULTS_BLOG_MARKER)
         }
         differ.submitList(newList)
+    }
+
+
+    fun preLoadGlideImages(
+        requestManager: RequestManager,
+        list: List<BlogPost>
+    ) {
+        for (blogPost in list) {
+            requestManager
+                .load(blogPost.image)
+                .preload()
+
+        }
     }
 
     class BlogViewHolder
