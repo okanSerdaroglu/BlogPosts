@@ -1,5 +1,6 @@
 package com.example.blogposts.ui.main.blog.viewmodel
 
+import android.net.Uri
 import com.example.blogposts.models.BlogPost
 import com.example.blogposts.ui.main.blog.BlogViewModel
 
@@ -55,9 +56,9 @@ fun BlogViewModel.isAuthorOfBlogPost(): Boolean {
 }
 
 fun BlogViewModel.getBlogPost(): BlogPost {
-    getCurrentViewStateOrNew()?.let {
-        return it.viewBlogFields.blogPost?.let {
-            return it
+    getCurrentViewStateOrNew()?.let { viewState ->
+        return viewState.viewBlogFields.blogPost?.let { blogPost ->
+            return blogPost
         } ?: getDummyBlogPost()
     }
 }
@@ -72,4 +73,13 @@ fun BlogViewModel.getDummyBlogPost(): BlogPost {
         date_updated = 1,
         username = ""
     )
+}
+
+fun BlogViewModel.getUpdatedBlogUri(): Uri? {
+    getCurrentViewStateOrNew().let { viewState ->
+        viewState.updateBlogFields.updatedImageUri?.let { uri ->
+            return uri
+        }
+    }
+    return null
 }
