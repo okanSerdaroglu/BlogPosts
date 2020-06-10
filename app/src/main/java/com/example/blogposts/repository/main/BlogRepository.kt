@@ -21,6 +21,7 @@ import com.example.blogposts.ui.main.blog.state.BlogViewState
 import com.example.blogposts.ui.main.blog.state.BlogViewState.*
 import com.example.blogposts.utils.*
 import com.example.blogposts.utils.ErrorHandling.Companion.ERROR_UNKNOWN
+import com.example.blogposts.utils.SuccessHandling.Companion.RESPONSE_HAS_PERMISSION_TO_EDIT
 import com.example.blogposts.utils.SuccessHandling.Companion.RESPONSE_NO_PERMISSION_TO_EDIT
 import com.example.blogposts.utils.SuccessHandling.Companion.SUCCESS_BLOG_DELETED
 import kotlinx.coroutines.Dispatchers.IO
@@ -168,7 +169,7 @@ constructor(
             override suspend fun handleApiSuccessResponse(response: ApiSuccessResponse<GenericResponse>) {
                 withContext(Main) {
                     Log.d(TAG, "handleApiSuccessResponse: ${response.body.response}")
-                    val isAuthor = response.body.response == RESPONSE_NO_PERMISSION_TO_EDIT
+                    val isAuthor = response.body.response == RESPONSE_HAS_PERMISSION_TO_EDIT
                     onCompleteJob(
                         DataState.data(
                             data = BlogViewState(
