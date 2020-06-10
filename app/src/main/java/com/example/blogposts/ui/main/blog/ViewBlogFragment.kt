@@ -7,11 +7,16 @@ import androidx.navigation.fragment.findNavController
 
 import com.example.blogposts.R
 import com.example.blogposts.models.BlogPost
+import com.example.blogposts.ui.AreYouSureCallback
+import com.example.blogposts.ui.UIMessage
+import com.example.blogposts.ui.UIMessageType
 import com.example.blogposts.ui.main.blog.state.BlogStateEvent
 import com.example.blogposts.ui.main.blog.state.BlogStateEvent.CheckAuthorBlogPostsEvent
 import com.example.blogposts.ui.main.blog.viewmodel.isAuthorOfBlogPost
+import com.example.blogposts.ui.main.blog.viewmodel.removeDeletedBlogPost
 import com.example.blogposts.ui.main.blog.viewmodel.setIsAuthorOfBlogPost
 import com.example.blogposts.utils.DateUtil
+import com.example.blogposts.utils.SuccessHandling.Companion.SUCCESS_BLOG_DELETED
 import kotlinx.android.synthetic.main.fragment_view_blog.*
 
 
@@ -33,7 +38,7 @@ class ViewBlogFragment : BaseBlogFragment() {
         checkAuthorOfBlogPost()
         stateChangeListener.expandAppbar()
         delete_button.setOnClickListener {
-            deleteBlogPost()
+            confirmDeleteRequest()
         }
     }
 
@@ -46,6 +51,12 @@ class ViewBlogFragment : BaseBlogFragment() {
                     viewModel.setIsAuthorOfBlogPost(
                         viewState.viewBlogFields.isAuthorOfBLogPost
                     )
+                }
+                data.response?.peekContent()?.let { response ->
+                    if (response.message == SUCCESS_BLOG_DELETED) {
+                        viewModel.removeDeletedBlogPost()
+                        findNavController().popBackStack()
+                    }
                 }
             }
         })
@@ -61,6 +72,23 @@ class ViewBlogFragment : BaseBlogFragment() {
 
         })
 
+    }
+
+    private fun confirmDeleteRequest() {
+        val callback: AreYouSureCallback = object : AreYouSureCallback {
+            override fun proceed() {
+                deleteBlogPost()
+            }
+
+            override fun cancel() {}
+
+        }
+        uiCommunicationListener.onUIMessageReceived(
+            UIMessage(
+                getString(R.string.are_you_sure_delete),
+                UIMessageType.AreYouSureDialog(callback)
+            )
+        )
     }
 
     private fun adaptViewToAuthorMode() {
