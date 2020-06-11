@@ -1,10 +1,15 @@
 package com.example.blogposts.ui
 
+import android.Manifest.*
 import android.content.Context
+import android.content.pm.PackageManager
 import android.util.Log
 import android.view.inputmethod.InputMethodManager
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.example.blogposts.session.SessionManager
 import com.example.blogposts.ui.ResponseType.*
+import com.example.blogposts.utils.Constants.Companion.PERMISSION_REQUEST_READ_STORAGE
 import dagger.android.support.DaggerAppCompatActivity
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.GlobalScope
@@ -117,6 +122,34 @@ abstract class BaseActivity : DaggerAppCompatActivity(),
                 Context.INPUT_METHOD_SERVICE
             ) as InputMethodManager
             inputMethodManager.hideSoftInputFromWindow(currentFocus!!.windowToken, 0)
+        }
+    }
+
+    override fun isStoragePermissionGranted(): Boolean {
+        if (
+            ContextCompat.checkSelfPermission(
+                this,
+                permission.READ_EXTERNAL_STORAGE
+            )
+            != PackageManager.PERMISSION_GRANTED &&
+            ContextCompat.checkSelfPermission(
+                this,
+                permission.WRITE_EXTERNAL_STORAGE
+            )
+            != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(
+                    permission.READ_EXTERNAL_STORAGE,
+                    permission.WRITE_EXTERNAL_STORAGE
+                ),
+                PERMISSION_REQUEST_READ_STORAGE
+            )
+            return false
+        } else {
+            // Permission has already been granted
+            return true
         }
     }
 
