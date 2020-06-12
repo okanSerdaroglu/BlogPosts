@@ -60,7 +60,7 @@ interface BlogPostsMainService {
     @PUT("blog/{slug}/update")
     fun updateBlog(
         @Header("Authorization") authorization: String,
-        @Part("slug") slug: String,
+        @Path("slug") slug: String,
         @Part("title") title: RequestBody,
         @Part("body") body: RequestBody,
         @Part image: MultipartBody.Part?
