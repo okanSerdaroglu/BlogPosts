@@ -102,7 +102,7 @@ abstract class BaseActivity : DaggerAppCompatActivity(),
 
                 is Dialog -> {
                     response.message?.let { message ->
-                        displayErrorDialog(message)
+                        displaySuccessDialog(message)
                     }
                 }
 
