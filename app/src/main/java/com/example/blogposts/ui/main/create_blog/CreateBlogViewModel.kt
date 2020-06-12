@@ -13,6 +13,8 @@ import com.example.blogposts.ui.main.create_blog.state.CreateBlogStateEvent.*
 import com.example.blogposts.ui.main.create_blog.state.CreateBlogViewState
 import com.example.blogposts.ui.main.create_blog.state.CreateBlogViewState.*
 import com.example.blogposts.utils.AbsentLiveData
+import okhttp3.MediaType
+import okhttp3.RequestBody
 import javax.inject.Inject
 
 class CreateBlogViewModel
@@ -25,7 +27,26 @@ constructor(
 
         when (stateEvent) {
             is CreateNewBlogEvent -> {
-                return AbsentLiveData.create()
+                return sessionManager.cachedToken.value?.let { authToken ->
+
+                    val title = RequestBody.create(
+                        MediaType.parse("text/plain"),
+                        stateEvent.title
+                    )
+
+                    val body = RequestBody.create(
+                        MediaType.parse("text/plain"),
+                        stateEvent.body
+                    )
+
+                    createBlogRepository.createNewBlogPost(
+                        authToken = authToken,
+                        title = title,
+                        body = body,
+                        image = stateEvent.image
+                    )
+
+                }?:AbsentLiveData.create()
             }
 
             is None -> {
@@ -56,6 +77,15 @@ constructor(
         uri?.let { newBlogFields.newImageUri = it }
         update.blogFields = newBlogFields
         setViewState(update)
+    }
+
+
+    fun getNewImageUri():Uri?{
+        getCurrentViewStateOrNew().let {viewState->
+            viewState.blogFields.let {newBlogFields->
+                return newBlogFields.newImageUri
+            }
+        }
     }
 
     fun clearNewBlogFields() {
