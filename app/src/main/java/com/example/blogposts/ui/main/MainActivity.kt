@@ -8,6 +8,7 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.navigation.NavController
+import com.bumptech.glide.RequestManager
 import com.example.blogposts.R
 import com.example.blogposts.ui.BaseActivity
 import com.example.blogposts.ui.auth.AuthActivity
@@ -20,18 +21,27 @@ import com.example.blogposts.ui.main.blog.ViewBlogFragment
 import com.example.blogposts.ui.main.create_blog.BaseCreateBlogFragment
 import com.example.blogposts.utils.BottomNavController
 import com.example.blogposts.utils.setUpNavigation
+import com.example.blogposts.viewmodels.ViewModelProviderFactory
 import com.google.android.material.appbar.AppBarLayout
 
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.android.synthetic.main.activity_main.*
+import javax.inject.Inject
 
 
-class MainActivity : BaseActivity(),
+class MainActivity : BaseActivity(), MainDependencyProvider,
     BottomNavController.NavGraphProvider,
     BottomNavController.OnNavigationGraphChanged,
     BottomNavController.OnNavigationReselectedListener {
 
     private lateinit var bottomNavigationView: BottomNavigationView
+
+    @Inject
+    lateinit var providerFactory: ViewModelProviderFactory
+
+    @Inject
+    lateinit var requestManager: RequestManager
+
 
     private val bottomNavController by lazy(LazyThreadSafetyMode.NONE) {
         BottomNavController(
@@ -161,5 +171,9 @@ class MainActivity : BaseActivity(),
     override fun expandAppbar() {
         findViewById<AppBarLayout>(R.id.app_bar).setExpanded(true)
     }
+
+    override fun getVMProviderFactory() = providerFactory // return providerFactory
+
+    override fun getGlideRequestManager() = requestManager // return requestManager
 
 }

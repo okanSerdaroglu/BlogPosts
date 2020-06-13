@@ -15,6 +15,7 @@ import com.example.blogposts.R
 import com.example.blogposts.di.Injectable
 import com.example.blogposts.ui.DataStateChangeListener
 import com.example.blogposts.ui.UICommunicationListener
+import com.example.blogposts.ui.main.MainDependencyProvider
 import com.example.blogposts.viewmodels.ViewModelProviderFactory
 import javax.inject.Inject
 
@@ -22,11 +23,7 @@ abstract class BaseCreateBlogFragment : Fragment(), Injectable {
 
     val TAG: String = "AppDebug"
 
-    @Inject
-    lateinit var requestManager: RequestManager
-
-    @Inject
-    lateinit var providerFactory:ViewModelProviderFactory
+    lateinit var dependencyProvider: MainDependencyProvider
 
     lateinit var stateChangeListener: DataStateChangeListener
 
@@ -39,7 +36,9 @@ abstract class BaseCreateBlogFragment : Fragment(), Injectable {
         setUpActionBarWithNavController(R.id.createBlogFragment, activity as AppCompatActivity)
 
         viewModel = activity?.run {
-            ViewModelProvider(this, providerFactory).get(CreateBlogViewModel::class.java)
+            ViewModelProvider(
+                this,
+                dependencyProvider.getVMProviderFactory()).get(CreateBlogViewModel::class.java)
         } ?: throw Exception("Invalid")
         cancelActiveJobs()
     }
@@ -59,6 +58,13 @@ abstract class BaseCreateBlogFragment : Fragment(), Injectable {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
+
+        try {
+            dependencyProvider = context as MainDependencyProvider
+        } catch (e: ClassCastException) {
+            Log.e(TAG, "$context must implement BaseCreateBlogProvider")
+        }
+
         try {
             stateChangeListener = context as DataStateChangeListener
         } catch (e: ClassCastException) {

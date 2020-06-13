@@ -87,7 +87,7 @@ class BlogFragment : BaseBlogFragment(), BlogListAdapter.Interaction,
 
                 recyclerAdapter.apply {
                     preLoadGlideImages(
-                        requestManager,
+                        dependencyProvider.getGlideRequestManager(),
                         viewState.blogFields.blogList
                     )
 
@@ -178,7 +178,7 @@ class BlogFragment : BaseBlogFragment(), BlogListAdapter.Interaction,
             removeItemDecoration(topSpacingItemDecoration)
             addItemDecoration(topSpacingItemDecoration)
             recyclerAdapter = BlogListAdapter(
-                requestManager = requestManager,
+                requestManager = dependencyProvider.getGlideRequestManager(),
                 interaction = this@BlogFragment
             )
 

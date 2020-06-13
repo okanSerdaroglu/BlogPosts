@@ -13,16 +13,14 @@ import androidx.navigation.ui.NavigationUI
 import com.example.blogposts.R
 import com.example.blogposts.di.Injectable
 import com.example.blogposts.ui.DataStateChangeListener
-import com.example.blogposts.viewmodels.ViewModelProviderFactory
+import com.example.blogposts.ui.main.MainDependencyProvider
 import java.lang.Exception
-import javax.inject.Inject
 
 abstract class BaseAccountFragment : Fragment(),Injectable {
 
     val TAG: String = "AppDebug"
 
-    @Inject
-    lateinit var providerFactory: ViewModelProviderFactory
+    lateinit var dependencyProvider: MainDependencyProvider
 
     lateinit var viewModel: AccountViewModel
 
@@ -33,7 +31,9 @@ abstract class BaseAccountFragment : Fragment(),Injectable {
         setUpActionBarWithNavController(R.id.accountFragment, activity as AppCompatActivity)
 
         viewModel = activity?.run {
-            ViewModelProvider(this, providerFactory).get(AccountViewModel::class.java)
+            ViewModelProvider(
+                this,
+                dependencyProvider.getVMProviderFactory()).get(AccountViewModel::class.java)
         } ?: throw Exception("invalid Activity")
 
         cancelActiveJobs()
@@ -50,6 +50,13 @@ abstract class BaseAccountFragment : Fragment(),Injectable {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
+
+        try {
+            dependencyProvider = context as MainDependencyProvider
+        } catch (e: ClassCastException) {
+            Log.e(TAG, "$context must implement MainDependencyProvider")
+        }
+
         try {
             stateChangeListener = context as DataStateChangeListener
         } catch (e: ClassCastException) {
