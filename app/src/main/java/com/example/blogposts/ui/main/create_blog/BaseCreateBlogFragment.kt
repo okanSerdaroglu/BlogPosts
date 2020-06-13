@@ -10,14 +10,13 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI
-import com.bumptech.glide.RequestManager
 import com.example.blogposts.R
 import com.example.blogposts.di.Injectable
 import com.example.blogposts.ui.DataStateChangeListener
 import com.example.blogposts.ui.UICommunicationListener
 import com.example.blogposts.ui.main.MainDependencyProvider
-import com.example.blogposts.viewmodels.ViewModelProviderFactory
-import javax.inject.Inject
+import com.example.blogposts.ui.main.create_blog.state.CREATE_BLOG_VIEW_STATE_BUNDLE_KEY
+import com.example.blogposts.ui.main.create_blog.state.CreateBlogViewState
 
 abstract class BaseCreateBlogFragment : Fragment(), Injectable {
 
@@ -29,18 +28,42 @@ abstract class BaseCreateBlogFragment : Fragment(), Injectable {
 
     lateinit var uiCommunicationListener: UICommunicationListener
 
-    lateinit var viewModel:CreateBlogViewModel
+    lateinit var viewModel: CreateBlogViewModel
+
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        if (isViewModelInitialized()) {
+            outState.putParcelable(
+                CREATE_BLOG_VIEW_STATE_BUNDLE_KEY,
+                viewModel.viewState.value
+            )
+        }
+        super.onSaveInstanceState(outState)
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        viewModel = activity?.run {
+            ViewModelProvider(
+                this,
+                dependencyProvider.getVMProviderFactory()
+            ).get(CreateBlogViewModel::class.java)
+        } ?: throw Exception("Invalid")
+        cancelActiveJobs()
+
+        // restore state after process death
+        savedInstanceState?.let { inState ->
+            (inState[CREATE_BLOG_VIEW_STATE_BUNDLE_KEY] as CreateBlogViewState?)?.let { viewState ->
+                viewModel.setViewState(viewState)
+            }
+        }
+    }
+
+    private fun isViewModelInitialized() = ::viewModel.isInitialized
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setUpActionBarWithNavController(R.id.createBlogFragment, activity as AppCompatActivity)
-
-        viewModel = activity?.run {
-            ViewModelProvider(
-                this,
-                dependencyProvider.getVMProviderFactory()).get(CreateBlogViewModel::class.java)
-        } ?: throw Exception("Invalid")
-        cancelActiveJobs()
     }
 
     fun setUpActionBarWithNavController(fragmentId: Int, activity: AppCompatActivity) {
@@ -53,7 +76,7 @@ abstract class BaseCreateBlogFragment : Fragment(), Injectable {
     }
 
     fun cancelActiveJobs() {
-        // viewModel.cancelActiveJobs()
+        viewModel.cancelActiveJobs()
     }
 
     override fun onAttach(context: Context) {
