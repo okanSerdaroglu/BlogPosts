@@ -50,13 +50,6 @@ abstract class BaseBlogFragment : Fragment(), Injectable {
         }
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        setUpActionBarWithNavController(R.id.blogFragment, activity as AppCompatActivity)
-
-
-    }
-
     override fun onSaveInstanceState(outState: Bundle) {
         if (isViewModelInitialized()) {
             outState.putParcelable(
@@ -68,6 +61,14 @@ abstract class BaseBlogFragment : Fragment(), Injectable {
     }
 
     private fun isViewModelInitialized() = ::viewModel.isInitialized
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        setUpActionBarWithNavController(R.id.blogFragment, activity as AppCompatActivity)
+
+
+    }
+
 
     private fun setUpActionBarWithNavController(fragmentId: Int, activity: AppCompatActivity) {
         val appBarConfiguration = AppBarConfiguration(setOf(fragmentId))

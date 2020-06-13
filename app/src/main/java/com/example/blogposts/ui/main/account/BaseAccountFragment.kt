@@ -14,9 +14,11 @@ import com.example.blogposts.R
 import com.example.blogposts.di.Injectable
 import com.example.blogposts.ui.DataStateChangeListener
 import com.example.blogposts.ui.main.MainDependencyProvider
+import com.example.blogposts.ui.main.account.state.ACCOUNT_VIEW_STATE_BUNDLE_KEY
+import com.example.blogposts.ui.main.account.state.AccountViewState
 import java.lang.Exception
 
-abstract class BaseAccountFragment : Fragment(),Injectable {
+abstract class BaseAccountFragment : Fragment(), Injectable {
 
     val TAG: String = "AppDebug"
 
@@ -26,20 +28,44 @@ abstract class BaseAccountFragment : Fragment(),Injectable {
 
     lateinit var stateChangeListener: DataStateChangeListener
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        setUpActionBarWithNavController(R.id.accountFragment, activity as AppCompatActivity)
+    override fun onSaveInstanceState(outState: Bundle) {
+        if (isViewModelInitialized()) {
+            outState.putParcelable(
+                ACCOUNT_VIEW_STATE_BUNDLE_KEY,
+                viewModel.viewState.value
+            )
+        }
+        super.onSaveInstanceState(outState)
+    }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
         viewModel = activity?.run {
             ViewModelProvider(
                 this,
-                dependencyProvider.getVMProviderFactory()).get(AccountViewModel::class.java)
+                dependencyProvider.getVMProviderFactory()
+            ).get(AccountViewModel::class.java)
         } ?: throw Exception("invalid Activity")
 
         cancelActiveJobs()
+
+        // restore state after process death
+        savedInstanceState?.let { inState ->
+            (inState[ACCOUNT_VIEW_STATE_BUNDLE_KEY] as AccountViewState?)?.let { viewState ->
+                viewModel.setViewState(viewState)
+            }
+        }
     }
 
-    fun setUpActionBarWithNavController(fragmentId: Int, activity: AppCompatActivity) {
+    private fun isViewModelInitialized() = ::viewModel.isInitialized
+
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        setUpActionBarWithNavController(R.id.accountFragment, activity as AppCompatActivity)
+    }
+
+    private fun setUpActionBarWithNavController(fragmentId: Int, activity: AppCompatActivity) {
         val appBarConfiguration = AppBarConfiguration(setOf(fragmentId))
         NavigationUI.setupActionBarWithNavController(
             activity,
