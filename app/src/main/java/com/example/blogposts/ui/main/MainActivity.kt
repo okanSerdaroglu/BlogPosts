@@ -10,6 +10,8 @@ import androidx.lifecycle.Observer
 import androidx.navigation.NavController
 import com.bumptech.glide.RequestManager
 import com.example.blogposts.R
+import com.example.blogposts.models.AUTH_TOKEN_BUNDLE_KEY
+import com.example.blogposts.models.AuthToken
 import com.example.blogposts.ui.BaseActivity
 import com.example.blogposts.ui.auth.AuthActivity
 import com.example.blogposts.ui.main.account.BaseAccountFragment
@@ -126,6 +128,19 @@ class MainActivity : BaseActivity(), MainDependencyProvider,
         return super.onOptionsItemSelected(item)
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putParcelable(AUTH_TOKEN_BUNDLE_KEY, sessionManager.cachedToken.value)
+        super.onSaveInstanceState(outState)
+    }
+
+    private fun restoreSession(savedInstanceState: Bundle?) {
+        savedInstanceState?.let { inState ->
+            inState[AUTH_TOKEN_BUNDLE_KEY]?.let { authToken ->
+                sessionManager.setValue(authToken as AuthToken)
+            }
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -138,11 +153,12 @@ class MainActivity : BaseActivity(), MainDependencyProvider,
         }
 
         subscribeObservers()
+        restoreSession(savedInstanceState)
     }
 
     fun subscribeObservers() {
         sessionManager.cachedToken.observe(this, Observer { authToken ->
-            Log.d(TAG, "MainActivity, subscribeObservers: ViewState: ${authToken}")
+            Log.d(TAG, "MainActivity, subscribeObservers: ViewState: $authToken")
             if (authToken == null || authToken.account_pk == -1 || authToken.token == null) {
                 navAuthActivity()
                 finish()
