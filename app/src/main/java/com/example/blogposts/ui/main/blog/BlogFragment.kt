@@ -53,9 +53,11 @@ class BlogFragment : BaseBlogFragment(), BlogListAdapter.Interaction,
         swipe_refresh.setOnRefreshListener(this)
         initRecyclerView()
         subscribeObservers()
-        if (savedInstanceState == null) {
-            onBLogSearchOrFilter()
-        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.refreshFromCache()
     }
 
 
@@ -90,7 +92,7 @@ class BlogFragment : BaseBlogFragment(), BlogListAdapter.Interaction,
                         dependencyProvider.getGlideRequestManager(),
                         viewState.blogFields.blogList
                     )
-
+                    Log.d(TAG,"#list items: ${viewState.blogFields.blogList.size}")
                     submitList(
                         list = viewState.blogFields.blogList,
                         isQueryExhausted = viewState.blogFields.isQueryExhausted

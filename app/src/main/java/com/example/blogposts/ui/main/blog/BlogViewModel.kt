@@ -56,6 +56,15 @@ constructor(
                 } ?: AbsentLiveData.create()
             }
 
+            is RestoreBLogListFromCache -> {
+               return blogRepository.restoreBlogListFromCache(
+                   query = getSearchQuery(),
+                   filterAndOrder = getOrder() + getFilter(),
+                   page = getPage()
+
+               )
+            }
+
             is CheckAuthorBlogPostsEvent -> {
                 sessionManager.cachedToken.value?.let { authToken ->
                     blogRepository.isAuthorOfBlogPost(
