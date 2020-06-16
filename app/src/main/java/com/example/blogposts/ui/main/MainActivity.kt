@@ -21,7 +21,9 @@ import com.example.blogposts.ui.main.blog.BaseBlogFragment
 import com.example.blogposts.ui.main.blog.UpdateBlogFragment
 import com.example.blogposts.ui.main.blog.ViewBlogFragment
 import com.example.blogposts.ui.main.create_blog.BaseCreateBlogFragment
+import com.example.blogposts.utils.BOTTOM_NAV_BACKSTACK_KEY
 import com.example.blogposts.utils.BottomNavController
+import com.example.blogposts.utils.BottomNavController.*
 import com.example.blogposts.utils.setUpNavigation
 import com.example.blogposts.viewmodels.ViewModelProviderFactory
 import com.google.android.material.appbar.AppBarLayout
@@ -32,9 +34,9 @@ import javax.inject.Inject
 
 
 class MainActivity : BaseActivity(), MainDependencyProvider,
-    BottomNavController.NavGraphProvider,
-    BottomNavController.OnNavigationGraphChanged,
-    BottomNavController.OnNavigationReselectedListener {
+    NavGraphProvider,
+    OnNavigationGraphChanged,
+    OnNavigationReselectedListener {
 
     private lateinit var bottomNavigationView: BottomNavigationView
 
@@ -128,8 +130,24 @@ class MainActivity : BaseActivity(), MainDependencyProvider,
         return super.onOptionsItemSelected(item)
     }
 
+    private fun setUpBottomNavigationView(savedInstanceState: Bundle?) {
+        bottomNavigationView = findViewById(R.id.bottom_navigation_view)
+        bottomNavigationView.setUpNavigation(bottomNavController, this)
+        if (savedInstanceState == null) {
+            bottomNavController.setupBottomNavigationBackStack(null)
+            bottomNavController.onNavigationItemSelected()
+        } else {
+            (savedInstanceState[BOTTOM_NAV_BACKSTACK_KEY] as IntArray)?.let { items ->
+                val backStack = BackStack()
+                backStack.addAll(items.toTypedArray())
+                bottomNavController.setupBottomNavigationBackStack(backStack)
+            }
+        }
+    }
+
     override fun onSaveInstanceState(outState: Bundle) {
         outState.putParcelable(AUTH_TOKEN_BUNDLE_KEY, sessionManager.cachedToken.value)
+        outState.putIntArray(BOTTOM_NAV_BACKSTACK_KEY,bottomNavController.navigationBackStack.toIntArray())
         super.onSaveInstanceState(outState)
     }
 
@@ -146,11 +164,7 @@ class MainActivity : BaseActivity(), MainDependencyProvider,
         setContentView(R.layout.activity_main)
 
         setupActionBar()
-        bottomNavigationView = findViewById(R.id.bottom_navigation_view)
-        bottomNavigationView.setUpNavigation(bottomNavController, this)
-        if (savedInstanceState == null) {
-            bottomNavController.onNavigationItemSelected()
-        }
+        setUpBottomNavigationView(savedInstanceState)
 
         subscribeObservers()
         restoreSession(savedInstanceState)
