@@ -60,6 +60,16 @@ class BlogFragment : BaseBlogFragment(), BlogListAdapter.Interaction,
         viewModel.refreshFromCache()
     }
 
+    override fun onPause() {
+        super.onPause()
+        saveLayoutManagerState()
+    }
+
+    private fun saveLayoutManagerState() {
+        blog_post_recyclerview.layoutManager?.onSaveInstanceState()?.let { lmState ->
+            viewModel.setLayoutManagerState(lmState)
+        }
+    }
 
     private fun onBLogSearchOrFilter() {
         viewModel.loadFirstPage().let {
@@ -92,7 +102,7 @@ class BlogFragment : BaseBlogFragment(), BlogListAdapter.Interaction,
                         dependencyProvider.getGlideRequestManager(),
                         viewState.blogFields.blogList
                     )
-                    Log.d(TAG,"#list items: ${viewState.blogFields.blogList.size}")
+                    Log.d(TAG, "#list items: ${viewState.blogFields.blogList.size}")
                     submitList(
                         list = viewState.blogFields.blogList,
                         isQueryExhausted = viewState.blogFields.isQueryExhausted
@@ -211,6 +221,12 @@ class BlogFragment : BaseBlogFragment(), BlogListAdapter.Interaction,
     override fun onItemSelected(position: Int, item: BlogPost) {
         viewModel.setBlogPost(item)
         findNavController().navigate(R.id.action_blogFragment_to_viewBlogFragment)
+    }
+
+    override fun restoreListPosition() {
+        viewModel.viewState.value?.blogFields?.layoutManagerState?.let { lmState ->
+            blog_post_recyclerview?.layoutManager?.onRestoreInstanceState(lmState)
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

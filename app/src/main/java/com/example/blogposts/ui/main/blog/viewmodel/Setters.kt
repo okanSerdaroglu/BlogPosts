@@ -1,6 +1,7 @@
 package com.example.blogposts.ui.main.blog.viewmodel
 
 import android.net.Uri
+import android.os.Parcelable
 import com.example.blogposts.models.BlogPost
 import com.example.blogposts.ui.main.blog.BlogViewModel
 
@@ -97,6 +98,18 @@ fun BlogViewModel.updateListItem(newBlogPost: BlogPost) {
         }
     }
     update.blogFields.blogList = list
+    setViewState(update)
+}
+
+fun BlogViewModel.clearLayoutManagerState(){
+    val update = getCurrentViewStateOrNew()
+    update.blogFields.layoutManagerState = null
+    setViewState(update)
+}
+
+fun BlogViewModel.setLayoutManagerState (layoutManagerState:Parcelable){
+    val update = getCurrentViewStateOrNew()
+    update.blogFields.layoutManagerState = layoutManagerState
     setViewState(update)
 }
 

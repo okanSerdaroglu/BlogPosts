@@ -10,7 +10,6 @@ import com.example.blogposts.R
 import com.example.blogposts.models.BlogPost
 import com.example.blogposts.utils.DateUtil
 import com.example.blogposts.utils.GenericViewHolder
-import kotlinx.android.synthetic.main.fragment_update_blog.view.*
 import kotlinx.android.synthetic.main.fragment_view_blog.view.*
 import kotlinx.android.synthetic.main.fragment_view_blog.view.blog_image
 import kotlinx.android.synthetic.main.fragment_view_blog.view.blog_title
@@ -130,7 +129,10 @@ class BlogListAdapter(
         if (isQueryExhausted) {
             newList?.add(NO_MORE_RESULTS_BLOG_MARKER)
         }
-        differ.submitList(newList)
+        val callback = Runnable {
+            interaction?.restoreListPosition()
+        }
+        differ.submitList(newList,callback)
     }
 
 
@@ -171,6 +173,8 @@ class BlogListAdapter(
 
     interface Interaction {
         fun onItemSelected(position: Int, item: BlogPost)
+
+        fun restoreListPosition()
     }
 
     override fun getItemCount(): Int {
