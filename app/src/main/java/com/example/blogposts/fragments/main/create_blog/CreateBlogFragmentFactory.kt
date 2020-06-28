@@ -4,7 +4,6 @@ import androidx.fragment.app.FragmentFactory
 import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.RequestManager
 import com.example.blogposts.di.main.MainScope
-import com.example.blogposts.ui.main.blog.BlogFragment
 import com.example.blogposts.ui.main.create_blog.CreateBlogFragment
 import javax.inject.Inject
 

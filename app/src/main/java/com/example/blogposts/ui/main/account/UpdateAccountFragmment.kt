@@ -15,7 +15,8 @@ import kotlinx.android.synthetic.main.fragment_login.input_email
 import kotlinx.android.synthetic.main.fragment_register.*
 import javax.inject.Inject
 
-class UpdateAccountFragment @Inject
+class UpdateAccountFragment
+@Inject
 constructor(
     private val viewModelFactory: ViewModelProvider.Factory
 ) : BaseAccountFragment(R.layout.fragment_update_account) {
