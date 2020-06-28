@@ -6,9 +6,10 @@ import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentFactory
 import androidx.lifecycle.Observer
 import androidx.navigation.NavController
-import com.bumptech.glide.RequestManager
+import com.example.blogposts.BaseApplication
 import com.example.blogposts.R
 import com.example.blogposts.models.AUTH_TOKEN_BUNDLE_KEY
 import com.example.blogposts.models.AuthToken
@@ -25,25 +26,31 @@ import com.example.blogposts.utils.BOTTOM_NAV_BACKSTACK_KEY
 import com.example.blogposts.utils.BottomNavController
 import com.example.blogposts.utils.BottomNavController.*
 import com.example.blogposts.utils.setUpNavigation
-import com.example.blogposts.viewmodels.AuthViewModelFactory
 import com.google.android.material.appbar.AppBarLayout
 
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import kotlinx.android.synthetic.main.activity_main.*
 import javax.inject.Inject
+import javax.inject.Named
 
 
-class MainActivity : BaseActivity(), MainDependencyProvider,
-    NavGraphProvider,
+class MainActivity : BaseActivity(),
     OnNavigationGraphChanged,
     OnNavigationReselectedListener {
 
+    @Inject
+    @Named("AccountFragmentFactory")
+    lateinit var accountFragmentFactory: FragmentFactory
+
+    @Inject
+    @Named("BlogFragmentFactory")
+    lateinit var blogFragmentFactory: FragmentFactory
+
+    @Inject
+    @Named("CreateBlogFragmentFactory")
+    lateinit var createBlogFragmentFactory: FragmentFactory
+
     private lateinit var bottomNavigationView: BottomNavigationView
-
-    @Inject
-    lateinit var providerFactory: AuthViewModelFactory
-
-    @Inject
-    lateinit var requestManager: RequestManager
 
 
     private val bottomNavController by lazy(LazyThreadSafetyMode.NONE) {
@@ -51,24 +58,8 @@ class MainActivity : BaseActivity(), MainDependencyProvider,
             this,
             R.id.main_nav_host_fragment,
             R.id.nav_blog,
-            this,
             this
         )
-    }
-
-    override fun getNavGraphId(itemId: Int) = when (itemId) {
-        R.id.nav_blog -> {
-            R.navigation.nav_graph_blog
-        }
-        R.id.nav_create_blog -> {
-            R.navigation.nav_graph_create_blog
-        }
-        R.id.nav_account -> {
-            R.navigation.nav_graph_account
-        }
-        else -> {
-            R.navigation.nav_graph_blog
-        }
     }
 
     override fun onGraphChange() {
@@ -146,7 +137,10 @@ class MainActivity : BaseActivity(), MainDependencyProvider,
 
     override fun onSaveInstanceState(outState: Bundle) {
         outState.putParcelable(AUTH_TOKEN_BUNDLE_KEY, sessionManager.cachedToken.value)
-        outState.putIntArray(BOTTOM_NAV_BACKSTACK_KEY,bottomNavController.navigationBackStack.toIntArray())
+        outState.putIntArray(
+            BOTTOM_NAV_BACKSTACK_KEY,
+            bottomNavController.navigationBackStack.toIntArray()
+        )
         super.onSaveInstanceState(outState)
     }
 
@@ -156,6 +150,11 @@ class MainActivity : BaseActivity(), MainDependencyProvider,
                 sessionManager.setValue(authToken as AuthToken)
             }
         }
+    }
+
+    override fun inject() {
+        (application as BaseApplication).mainComponent()
+            .inject(this)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -187,6 +186,7 @@ class MainActivity : BaseActivity(), MainDependencyProvider,
         val intent = Intent(this, AuthActivity::class.java)
         startActivity(intent)
         finish()
+        (application as BaseApplication).releaseMainComponent()
     }
 
     override fun displayProgressBar(bool: Boolean) {
@@ -200,9 +200,5 @@ class MainActivity : BaseActivity(), MainDependencyProvider,
     override fun expandAppbar() {
         findViewById<AppBarLayout>(R.id.app_bar).setExpanded(true)
     }
-
-    override fun getVMProviderFactory() = providerFactory // return providerFactory
-
-    override fun getGlideRequestManager() = requestManager // return requestManager
 
 }

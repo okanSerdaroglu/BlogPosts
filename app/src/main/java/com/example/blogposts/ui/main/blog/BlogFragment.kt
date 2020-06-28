@@ -12,7 +12,9 @@ import android.widget.RadioGroup
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -20,30 +22,67 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
 import com.afollestad.materialdialogs.customview.getCustomView
+import com.bumptech.glide.RequestManager
 import com.example.blogposts.R
+import com.example.blogposts.di.main.MainScope
 import com.example.blogposts.models.BlogPost
 import com.example.blogposts.persistesnce.BlogQueryUtils.Companion.BLOG_FILTER_DATE_UPDATED
 import com.example.blogposts.persistesnce.BlogQueryUtils.Companion.BLOG_FILTER_USERNAME
 import com.example.blogposts.persistesnce.BlogQueryUtils.Companion.BLOG_ORDER_ASC
 import com.example.blogposts.ui.DataState
+import com.example.blogposts.ui.main.blog.state.BLOG_VIEW_STATE_BUNDLE_KEY
 import com.example.blogposts.ui.main.blog.state.BlogViewState
 import com.example.blogposts.ui.main.blog.viewmodel.*
 import com.example.blogposts.utils.ErrorHandling
 import com.example.blogposts.utils.TopSpacingItemDecoration
 import kotlinx.android.synthetic.main.fragment_blog.*
+import javax.inject.Inject
 
-class BlogFragment : BaseBlogFragment(), BlogListAdapter.Interaction,
+@MainScope
+class BlogFragment
+@Inject
+constructor(
+    private val viewModelFactory: ViewModelProvider.Factory,
+    private val requestManager: RequestManager
+) : BaseBlogFragment(R.layout.fragment_blog), BlogListAdapter.Interaction,
     SwipeRefreshLayout.OnRefreshListener {
+
+    val viewModel: BlogViewModel by viewModels {
+        viewModelFactory
+    }
 
     private lateinit var recyclerAdapter: BlogListAdapter
     private lateinit var searchView: SearchView
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_blog, container, false)
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        cancelActiveJobs()
+
+        // restore state after process death
+        savedInstanceState?.let { inState ->
+            (inState[BLOG_VIEW_STATE_BUNDLE_KEY] as BlogViewState?)?.let { viewState ->
+                viewModel.setViewState(viewState)
+            }
+        }
+    }
+
+    override fun cancelActiveJobs() {
+        viewModel.cancelActiveJobs()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+
+        val viewState = viewModel.viewState.value
+        viewState?.blogFields?.blogList = ArrayList()
+
+        outState.putParcelable(
+            BLOG_VIEW_STATE_BUNDLE_KEY,
+            viewState
+        )
+
+        super.onSaveInstanceState(outState)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -99,7 +138,7 @@ class BlogFragment : BaseBlogFragment(), BlogListAdapter.Interaction,
 
                 recyclerAdapter.apply {
                     preLoadGlideImages(
-                        dependencyProvider.getGlideRequestManager(),
+                        requestManager,
                         viewState.blogFields.blogList
                     )
                     Log.d(TAG, "#list items: ${viewState.blogFields.blogList.size}")
@@ -190,7 +229,7 @@ class BlogFragment : BaseBlogFragment(), BlogListAdapter.Interaction,
             removeItemDecoration(topSpacingItemDecoration)
             addItemDecoration(topSpacingItemDecoration)
             recyclerAdapter = BlogListAdapter(
-                requestManager = dependencyProvider.getGlideRequestManager(),
+                requestManager = requestManager,
                 interaction = this@BlogFragment
             )
 

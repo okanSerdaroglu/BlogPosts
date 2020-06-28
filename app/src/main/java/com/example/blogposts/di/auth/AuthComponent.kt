@@ -3,6 +3,7 @@ package com.example.blogposts.di.auth
 import com.example.blogposts.ui.auth.AuthActivity
 import dagger.Subcomponent
 
+@AuthScope
 @Subcomponent(
     modules = [
         AuthModule::class,

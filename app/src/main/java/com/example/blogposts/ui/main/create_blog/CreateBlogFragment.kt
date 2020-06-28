@@ -7,10 +7,15 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
 import android.view.*
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
+import com.bumptech.glide.RequestManager
 import com.example.blogposts.R
 import com.example.blogposts.ui.*
+import com.example.blogposts.ui.main.create_blog.state.CREATE_BLOG_VIEW_STATE_BUNDLE_KEY
 import com.example.blogposts.ui.main.create_blog.state.CreateBlogStateEvent
+import com.example.blogposts.ui.main.create_blog.state.CreateBlogViewState
 import com.example.blogposts.utils.Constants.Companion.GALLERY_REQUEST_CODE
 import com.example.blogposts.utils.ErrorHandling.Companion.ERROR_MUST_SELECT_IMAGE
 import com.example.blogposts.utils.ErrorHandling.Companion.ERROR_SOMETHING_WRONG_WITH_IMAGE
@@ -25,16 +30,43 @@ import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import java.io.File
+import javax.inject.Inject
 
-class CreateBlogFragment : BaseCreateBlogFragment() {
+class CreateBlogFragment
+@Inject
+constructor(
+    private val viewModelFactory: ViewModelProvider.Factory,
+    private val requestManager: RequestManager
+) : BaseCreateBlogFragment(R.layout.fragment_create_blog) {
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_create_blog, container, false)
+    val viewModel: CreateBlogViewModel by viewModels {
+        viewModelFactory
     }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+
+        outState.putParcelable(
+            CREATE_BLOG_VIEW_STATE_BUNDLE_KEY,
+            viewModel.viewState.value
+        )
+
+        super.onSaveInstanceState(outState)
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        cancelActiveJobs()
+
+
+        // restore state after process death
+        savedInstanceState?.let { inState ->
+            (inState[CREATE_BLOG_VIEW_STATE_BUNDLE_KEY] as CreateBlogViewState?)?.let { viewState ->
+                viewModel.setViewState(viewState)
+            }
+        }
+    }
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -53,16 +85,20 @@ class CreateBlogFragment : BaseCreateBlogFragment() {
         subscribeObservers()
     }
 
+    override fun cancelActiveJobs() {
+
+    }
+
     private fun setBlogProperties(title: String?, body: String?, image: Uri?) {
         image?.let {
-            dependencyProvider.getGlideRequestManager().load(image).into(blog_image)
+            requestManager.load(image).into(blog_image)
         } ?: setDefaultImage()
         blog_title.setText(title)
         blog_body.setText(body)
     }
 
     private fun setDefaultImage() {
-        dependencyProvider.getGlideRequestManager().load(R.drawable.default_image).into(blog_image)
+        requestManager.load(R.drawable.default_image).into(blog_image)
     }
 
     private fun pickFromGallery() {
