@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.switchMap
 import com.example.blogposts.api.GenericResponse
 import com.example.blogposts.api.main.BlogPostsMainService
+import com.example.blogposts.di.main.MainScope
 import com.example.blogposts.models.AccountProperties
 import com.example.blogposts.models.AuthToken
 import com.example.blogposts.persistesnce.AccountPropertiesDao
@@ -22,6 +23,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
+@MainScope
 class AccountRepository
 @Inject
 constructor(

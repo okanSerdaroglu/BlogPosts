@@ -3,6 +3,7 @@ package com.example.blogposts.repository.main
 import androidx.lifecycle.LiveData
 import com.example.blogposts.api.main.BlogPostsMainService
 import com.example.blogposts.api.main.responses.BlogCreateUpdateResponse
+import com.example.blogposts.di.main.MainScope
 import com.example.blogposts.models.AuthToken
 import com.example.blogposts.models.BlogPost
 import com.example.blogposts.persistesnce.BlogPostDao
@@ -25,6 +26,7 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import javax.inject.Inject
 
+@MainScope
 class CreateBlogRepository
 @Inject
 constructor(

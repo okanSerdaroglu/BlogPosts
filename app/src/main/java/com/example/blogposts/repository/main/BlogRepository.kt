@@ -8,6 +8,7 @@ import com.example.blogposts.api.GenericResponse
 import com.example.blogposts.api.main.BlogPostsMainService
 import com.example.blogposts.api.main.responses.BlogCreateUpdateResponse
 import com.example.blogposts.api.main.responses.BlogListSearchResponse
+import com.example.blogposts.di.main.MainScope
 import com.example.blogposts.models.AuthToken
 import com.example.blogposts.models.BlogPost
 import com.example.blogposts.persistesnce.BlogPostDao
@@ -34,6 +35,7 @@ import okhttp3.RequestBody
 import java.lang.Exception
 import javax.inject.Inject
 
+@MainScope
 class BlogRepository
 @Inject
 constructor(

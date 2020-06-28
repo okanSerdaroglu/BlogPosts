@@ -4,22 +4,58 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import androidx.activity.viewModels
+import androidx.fragment.app.FragmentFactory
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.NavController
-import androidx.navigation.NavDestination
+import com.example.blogposts.BaseApplication
 import com.example.blogposts.R
+import com.example.blogposts.fragments.auth.AuthNavHostFragment
 import com.example.blogposts.ui.BaseActivity
 import com.example.blogposts.ui.auth.state.AuthStateEvent
 import com.example.blogposts.ui.main.MainActivity
-import com.example.blogposts.viewmodels.AuthViewModelFactory
+import com.example.blogposts.utils.SuccessHandling.Companion.RESPONSE_CHECK_PREVIOUS_AUTH_USER_DONE
+import kotlinx.android.synthetic.main.activity_auth.*
 import javax.inject.Inject
 
-class AuthActivity : BaseActivity(), NavController.OnDestinationChangedListener {
+class AuthActivity : BaseActivity() {
 
     @Inject
-    lateinit var providerFactory: AuthViewModelFactory
-    lateinit var viewModel: AuthViewModel
+    lateinit var fragmentFactory: FragmentFactory
+
+    @Inject
+    lateinit var providerFactory: ViewModelProvider.Factory
+
+    val viewModel: AuthViewModel by viewModels {
+        providerFactory
+    }
+
+    private fun onRestoreInstanceState() {
+        val host = supportFragmentManager
+            .findFragmentById(R.id.auth_fragments_container)
+        host?.let {
+            // do nothing
+        } ?: createNavHost()
+    }
+
+    private fun createNavHost() {
+        val navHost = AuthNavHostFragment.create(
+            R.navigation.nav_graph_auth
+        )
+        supportFragmentManager.beginTransaction()
+            .replace(
+                R.id.auth_fragments_container,
+                navHost,
+                getString(R.string.AuthNavHost)
+            )
+            .setPrimaryNavigationFragment(navHost)
+            .commit()
+    }
+
+    override fun inject() {
+        (application as BaseApplication).authComponent()
+            .inject(this)
+    }
 
     override fun displayProgressBar(boolean: Boolean) {
         if (boolean) {
@@ -32,9 +68,8 @@ class AuthActivity : BaseActivity(), NavController.OnDestinationChangedListener 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_auth)
-        viewModel = ViewModelProvider(this, providerFactory).get(AuthViewModel::class.java)
-        findNavController(R.id.auth_fragments_container).addOnDestinationChangedListener(this)
         subscribeObservers()
+        onRestoreInstanceState()
     }
 
     override fun onResume() {
@@ -54,15 +89,26 @@ class AuthActivity : BaseActivity(), NavController.OnDestinationChangedListener 
             onDataStateChange(dataState)
             dataState.data?.let { data ->
                 data.data?.let { event ->
-                    event.getContentIfNotHandled()?.let { authViewState ->
-                        authViewState.authToken?.let { authToken ->
-                            Log.d(TAG, "AuthActivity, DataState: $authToken")
-                            viewModel.setAuthToken(authToken)
+                    event.getContentIfNotHandled()?.let {
+                        it.authToken?.let {
+                            Log.d(TAG, "AuthActivity, DataState: ${it}")
+                            viewModel.setAuthToken(it)
+                        }
+                    }
+                }
+                data.response?.let { event ->
+                    event.peekContent().let { response ->
+                        response.message?.let { message ->
+                            if (message.equals(RESPONSE_CHECK_PREVIOUS_AUTH_USER_DONE)) {
+                                onFinishCheckPreviousAuthUser()
+                            }
                         }
                     }
                 }
             }
         })
+
+
 
         viewModel.viewState.observe(this, Observer { authViewState ->
             authViewState.authToken?.let { authToken ->
@@ -80,18 +126,15 @@ class AuthActivity : BaseActivity(), NavController.OnDestinationChangedListener 
         })
     }
 
+    private fun onFinishCheckPreviousAuthUser() {
+        fragment_container.visibility = View.VISIBLE
+    }
+
     private fun navMainActivity() {
         val intent = Intent(this, MainActivity::class.java)
         startActivity(intent)
         finish()
-    }
-
-    override fun onDestinationChanged(
-        controller: NavController,
-        destination: NavDestination,
-        arguments: Bundle?
-    ) {
-        viewModel.cancelActiveJobs()
+        (application as BaseApplication).releaseAuthComponent()
     }
 
     override fun expandAppbar() {

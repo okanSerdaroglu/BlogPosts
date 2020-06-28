@@ -7,6 +7,7 @@ import androidx.lifecycle.LiveData
 import com.example.blogposts.api.auth.BlogPostsAuthService
 import com.example.blogposts.api.auth.network_responses.LoginResponse
 import com.example.blogposts.api.auth.network_responses.RegistrationResponse
+import com.example.blogposts.di.auth.AuthScope
 import com.example.blogposts.models.AccountProperties
 import com.example.blogposts.models.AuthToken
 import com.example.blogposts.persistesnce.AccountPropertiesDao
@@ -28,10 +29,10 @@ import com.example.blogposts.utils.ErrorHandling.Companion.GENERIC_AUTH_ERROR
 import com.example.blogposts.utils.GenericApiResponse
 import com.example.blogposts.utils.PreferenceKeys
 import com.example.blogposts.utils.SuccessHandling.Companion.RESPONSE_CHECK_PREVIOUS_AUTH_USER_DONE
-import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.Job
 import javax.inject.Inject
 
+@AuthScope
 class AuthRepository
 @Inject
 constructor(
