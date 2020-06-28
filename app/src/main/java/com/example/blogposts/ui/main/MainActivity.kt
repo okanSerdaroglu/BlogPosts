@@ -25,11 +25,10 @@ import com.example.blogposts.utils.BOTTOM_NAV_BACKSTACK_KEY
 import com.example.blogposts.utils.BottomNavController
 import com.example.blogposts.utils.BottomNavController.*
 import com.example.blogposts.utils.setUpNavigation
-import com.example.blogposts.viewmodels.ViewModelProviderFactory
+import com.example.blogposts.viewmodels.AuthViewModelFactory
 import com.google.android.material.appbar.AppBarLayout
 
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import kotlinx.android.synthetic.main.activity_main.*
 import javax.inject.Inject
 
 
@@ -41,7 +40,7 @@ class MainActivity : BaseActivity(), MainDependencyProvider,
     private lateinit var bottomNavigationView: BottomNavigationView
 
     @Inject
-    lateinit var providerFactory: ViewModelProviderFactory
+    lateinit var providerFactory: AuthViewModelFactory
 
     @Inject
     lateinit var requestManager: RequestManager

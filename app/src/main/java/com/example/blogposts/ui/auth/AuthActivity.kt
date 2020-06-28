@@ -8,19 +8,17 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
-import androidx.navigation.findNavController
 import com.example.blogposts.R
 import com.example.blogposts.ui.BaseActivity
 import com.example.blogposts.ui.auth.state.AuthStateEvent
 import com.example.blogposts.ui.main.MainActivity
-import com.example.blogposts.viewmodels.ViewModelProviderFactory
-import kotlinx.android.synthetic.main.activity_main.*
+import com.example.blogposts.viewmodels.AuthViewModelFactory
 import javax.inject.Inject
 
 class AuthActivity : BaseActivity(), NavController.OnDestinationChangedListener {
 
     @Inject
-    lateinit var providerFactory: ViewModelProviderFactory
+    lateinit var providerFactory: AuthViewModelFactory
     lateinit var viewModel: AuthViewModel
 
     override fun displayProgressBar(boolean: Boolean) {

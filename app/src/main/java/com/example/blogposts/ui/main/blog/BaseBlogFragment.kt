@@ -12,7 +12,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI
 import com.example.blogposts.R
-import com.example.blogposts.di.Injectable
 import com.example.blogposts.ui.DataStateChangeListener
 import com.example.blogposts.ui.UICommunicationListener
 import com.example.blogposts.ui.main.MainDependencyProvider
