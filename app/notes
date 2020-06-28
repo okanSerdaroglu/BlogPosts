@@ -1,0 +1,14 @@
+
+Remove dagger-android (Steps)
+
+ 1 - remove dagger android
+
+ 2 - refactor to use FragmentFactory to provide all fragments.
+     Now we can do constructor injection in fragments
+
+ 3 - remove MainDependencyProvider ( was a work-around for dagger android )
+
+ 4 - Create custom NavHostFragment for each "feature" (auth, account, blog, create_blog)
+
+
+  
