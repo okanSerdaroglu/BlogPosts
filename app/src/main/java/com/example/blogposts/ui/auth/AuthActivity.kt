@@ -12,12 +12,17 @@ import com.example.blogposts.BaseApplication
 import com.example.blogposts.R
 import com.example.blogposts.fragments.auth.AuthNavHostFragment
 import com.example.blogposts.ui.BaseActivity
-import com.example.blogposts.ui.auth.state.AuthStateEvent
+import com.example.blogposts.ui.auth.state.AuthStateEvent.*
 import com.example.blogposts.ui.main.MainActivity
+import com.example.blogposts.utils.StateMessageCallback
 import com.example.blogposts.utils.SuccessHandling.Companion.RESPONSE_CHECK_PREVIOUS_AUTH_USER_DONE
 import kotlinx.android.synthetic.main.activity_auth.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import javax.inject.Inject
 
+@FlowPreview
+@ExperimentalCoroutinesApi
 class AuthActivity : BaseActivity() {
 
     @Inject
@@ -30,9 +35,16 @@ class AuthActivity : BaseActivity() {
         providerFactory
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        inject()
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_auth)
+        subscribeObservers()
+        onRestoreInstanceState()
+    }
+
     private fun onRestoreInstanceState() {
-        val host = supportFragmentManager
-            .findFragmentById(R.id.auth_fragments_container)
+        val host = supportFragmentManager.findFragmentById(R.id.auth_fragments_container)
         host?.let {
             // do nothing
         } ?: createNavHost()
@@ -52,93 +64,84 @@ class AuthActivity : BaseActivity() {
             .commit()
     }
 
-    override fun inject() {
-        (application as BaseApplication).authComponent()
-            .inject(this)
-    }
-
-    override fun displayProgressBar(boolean: Boolean) {
-        if (boolean) {
-            progress_bar.visibility = View.VISIBLE
-        } else {
-            progress_bar.visibility = View.GONE
-        }
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_auth)
-        subscribeObservers()
-        onRestoreInstanceState()
-    }
-
     override fun onResume() {
         super.onResume()
         checkPreviousAuthUser()
     }
 
-    private fun checkPreviousAuthUser() {
-        viewModel.setStateEvent(
-            event = AuthStateEvent.CheckPreviousAuthEvent()
-        )
-    }
-
     private fun subscribeObservers() {
 
-        viewModel.dataState.observe(this, Observer { dataState ->
-            onDataStateChange(dataState)
-            dataState.data?.let { data ->
-                data.data?.let { event ->
-                    event.getContentIfNotHandled()?.let {
-                        it.authToken?.let {
-                            Log.d(TAG, "AuthActivity, DataState: ${it}")
-                            viewModel.setAuthToken(it)
-                        }
-                    }
-                }
-                data.response?.let { event ->
-                    event.peekContent().let { response ->
-                        response.message?.let { message ->
-                            if (message.equals(RESPONSE_CHECK_PREVIOUS_AUTH_USER_DONE)) {
-                                onFinishCheckPreviousAuthUser()
-                            }
-                        }
-                    }
-                }
+        viewModel.viewState.observe(this, Observer { viewState ->
+            Log.d(TAG, "AuthActivity, subscribeObservers: AuthViewState: $viewState")
+            viewState.authToken?.let {
+                sessionManager.login(it)
             }
         })
 
+        viewModel.numActiveJobs.observe(this, Observer { jobCounter ->
+            displayProgressBar(viewModel.areAnyJobsActive())
+        })
 
+        viewModel.stateMessage.observe(this, Observer { stateMessage ->
 
-        viewModel.viewState.observe(this, Observer { authViewState ->
-            authViewState.authToken?.let { authToken ->
-                sessionManager.login(authToken)
+            stateMessage?.let {
+
+                if (stateMessage.response.message.equals(RESPONSE_CHECK_PREVIOUS_AUTH_USER_DONE)) {
+                    onFinishCheckPreviousAuthUser()
+                }
+
+                onResponseReceived(
+                    response = it.response,
+                    stateMessageCallback = object : StateMessageCallback {
+                        override fun removeMessageFromStack() {
+                            viewModel.clearStateMessage()
+                        }
+                    }
+                )
             }
         })
-        sessionManager.cachedToken.observe(this, Observer { authToken ->
-            Log.d(TAG, "AuthActivity : subscribeObservers: AuthToken: $authToken")
-            if (authToken != null
-                && authToken.account_pk != -1
-                && authToken.token != null
-            ) {
-                navMainActivity()
+
+        sessionManager.cachedToken.observe(this, Observer { token ->
+            token.let { authToken ->
+                if (authToken != null && authToken.account_pk != -1 && authToken.token != null) {
+                    navMainActivity()
+                }
             }
         })
     }
 
     private fun onFinishCheckPreviousAuthUser() {
         fragment_container.visibility = View.VISIBLE
+        splash_logo.visibility = View.INVISIBLE
     }
 
-    private fun navMainActivity() {
+    fun navMainActivity() {
         val intent = Intent(this, MainActivity::class.java)
         startActivity(intent)
         finish()
         (application as BaseApplication).releaseAuthComponent()
     }
 
-    override fun expandAppbar() {
-        TODO("Not yet implemented")
+    private fun checkPreviousAuthUser() {
+        viewModel.setStateEvent(CheckPreviousAuthEvent())
     }
+
+    override fun inject() {
+        (application as BaseApplication).authComponent()
+            .inject(this)
+    }
+
+    override fun displayProgressBar(isLoading: Boolean) {
+        if (isLoading) {
+            progress_bar.visibility = View.VISIBLE
+        } else {
+            progress_bar.visibility = View.GONE
+        }
+    }
+
+    override fun expandAppBar() {
+        // ignore
+    }
+
 
 }
