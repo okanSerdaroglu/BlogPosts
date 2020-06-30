@@ -1,77 +1,83 @@
 package com.example.blogposts.ui.main.account
 
-import androidx.lifecycle.LiveData
+import com.example.blogposts.di.main.MainScope
 import com.example.blogposts.models.AccountProperties
 import com.example.blogposts.repository.main.AccountRepositoryImpl
 import com.example.blogposts.session.SessionManager
 import com.example.blogposts.ui.BaseViewModel
-import com.example.blogposts.utils.DataState
-import com.example.blogposts.utils.Loading
-import com.example.blogposts.ui.main.account.state.AccountStateEvent
 import com.example.blogposts.ui.main.account.state.AccountStateEvent.*
 import com.example.blogposts.ui.main.account.state.AccountViewState
+import com.example.blogposts.utils.*
+import com.example.blogposts.utils.ErrorHandling.Companion.INVALID_STATE_EVENT
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
+@ExperimentalCoroutinesApi
+@FlowPreview
+@MainScope
 class AccountViewModel
 @Inject
 constructor(
     val sessionManager: SessionManager,
     val accountRepository: AccountRepositoryImpl
-) : BaseViewModel<AccountStateEvent, AccountViewState>() {
+) : BaseViewModel<AccountViewState>() {
 
-    override fun handleStateEvent(stateEvent: AccountStateEvent): LiveData<DataState<AccountViewState>> {
-        when (stateEvent) {
-            is GetAccountPropertiesEvent -> {
-                return sessionManager.cachedToken.value?.let { authToken ->
+    override fun handleNewData(data: AccountViewState) {
+        data.accountProperties?.let { accountProperties ->
+            setAccountPropertiesData(accountProperties)
+        }
+    }
+
+    override fun setStateEvent(stateEvent: StateEvent) {
+        sessionManager.cachedToken.value?.let { authToken ->
+            val job: Flow<DataState<AccountViewState>> = when (stateEvent) {
+
+                is GetAccountPropertiesEvent -> {
                     accountRepository.getAccountProperties(
+                        stateEvent = stateEvent,
                         authToken = authToken
                     )
-                } ?: AbsentLiveData.create()
-            }
+                }
 
-            is UpdateAccountPropertiesEvent -> {
-                return sessionManager.cachedToken.value?.let { authToken ->
-                    authToken.account_pk?.let { pk ->
-                        accountRepository.saveAccountProperties(
-                            authToken = authToken,
-                            accountProperties = AccountProperties(
-                                pk = pk,
-                                email = stateEvent.email,
-                                username = stateEvent.username
-                            )
-                        )
-                    }
-                } ?: AbsentLiveData.create()
-            }
+                is UpdateAccountPropertiesEvent -> {
+                    accountRepository.saveAccountProperties(
+                        stateEvent = stateEvent,
+                        authToken = authToken,
+                        email = stateEvent.email,
+                        username = stateEvent.username
+                    )
+                }
 
-            is ChangePasswordEvent -> {
-                return sessionManager.cachedToken.value?.let { authToken ->
+                is ChangePasswordEvent -> {
                     accountRepository.updatePassword(
+                        stateEvent = stateEvent,
                         authToken = authToken,
                         currentPassword = stateEvent.currentPassword,
                         newPassword = stateEvent.newPassword,
                         confirmNewPassword = stateEvent.confirmNewPassword
                     )
-                } ?: AbsentLiveData.create()
-            }
+                }
 
-            is None -> {
-                return object : LiveData<DataState<AccountViewState>>() {
-                    override fun onActive() {
-                        super.onActive()
-                        value = DataState(
-                            error = null,
-                            loading = Loading(false),
-                            data = null
+                else -> {
+                    flow {
+                        emit(
+                            DataState.error(
+                                response = Response(
+                                    message = INVALID_STATE_EVENT,
+                                    uiComponentType = UIComponentType.None(),
+                                    messageType = MessageType.Error()
+                                ),
+                                stateEvent = stateEvent
+                            )
                         )
                     }
                 }
             }
+            launchJob(stateEvent, job)
         }
-    }
-
-    override fun initViewState(): AccountViewState {
-        return AccountViewState()
     }
 
     fun setAccountPropertiesData(accountProperties: AccountProperties) {
@@ -79,29 +85,21 @@ constructor(
         if (update.accountProperties == accountProperties) {
             return
         }
-
         update.accountProperties = accountProperties
         setViewState(update)
+    }
 
-
+    override fun initNewViewState(): AccountViewState {
+        return AccountViewState()
     }
 
     fun logout() {
         sessionManager.logOut()
     }
 
-    fun cancelActiveJobs() {
-        handlePendingData()
-        accountRepository.cancelActiveJobs()
-    }
-
     override fun onCleared() {
         super.onCleared()
         cancelActiveJobs()
-    }
-
-    private fun handlePendingData() {
-        setStateEvent(None())
     }
 
 }

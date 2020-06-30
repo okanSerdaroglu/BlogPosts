@@ -5,43 +5,53 @@ import android.os.Parcelable
 import com.example.blogposts.models.BlogPost
 import com.example.blogposts.ui.main.blog.BlogViewModel
 
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
+
+@FlowPreview
+@ExperimentalCoroutinesApi
 fun BlogViewModel.setQuery(query: String) {
     val update = getCurrentViewStateOrNew()
     update.blogFields.searchQuery = query
     setViewState(update)
-
 }
 
+@FlowPreview
+@ExperimentalCoroutinesApi
 fun BlogViewModel.setBlogListData(blogList: List<BlogPost>) {
     val update = getCurrentViewStateOrNew()
     update.blogFields.blogList = blogList
     setViewState(update)
 }
 
-fun BlogViewModel.setQueryExhausted(isExhausted: Boolean) {
-    val update = getCurrentViewStateOrNew()
-    update.blogFields.isQueryExhausted = isExhausted
-    setViewState(update)
-}
-
-fun BlogViewModel.setQueryInProgress(isInProgress: Boolean) {
-    val update = getCurrentViewStateOrNew()
-    update.blogFields.isQueryInProgress = isInProgress
-    setViewState(update)
-}
-
+@FlowPreview
+@ExperimentalCoroutinesApi
 fun BlogViewModel.setBlogPost(blogPost: BlogPost) {
     val update = getCurrentViewStateOrNew()
     update.viewBlogFields.blogPost = blogPost
     setViewState(update)
 }
 
+@FlowPreview
+@ExperimentalCoroutinesApi
 fun BlogViewModel.setIsAuthorOfBlogPost(isAuthorOfBlogPost: Boolean) {
     val update = getCurrentViewStateOrNew()
-    update.viewBlogFields.isAuthorOfBLogPost = isAuthorOfBlogPost
+    update.viewBlogFields.isAuthorOfBlogPost = isAuthorOfBlogPost
     setViewState(update)
 }
 
+@FlowPreview
+@ExperimentalCoroutinesApi
+fun BlogViewModel.setQueryExhausted(isExhausted: Boolean) {
+    val update = getCurrentViewStateOrNew()
+    update.blogFields.isQueryExhausted = isExhausted
+    setViewState(update)
+}
+
+
+// Filter can be "date_updated" or "username"
+@FlowPreview
+@ExperimentalCoroutinesApi
 fun BlogViewModel.setBlogFilter(filter: String?) {
     filter?.let {
         val update = getCurrentViewStateOrNew()
@@ -50,76 +60,94 @@ fun BlogViewModel.setBlogFilter(filter: String?) {
     }
 }
 
-fun BlogViewModel.setBlogOrder(order: String) {
+// Order can be "-" or ""
+// Note: "-" = DESC, "" = ASC
+@FlowPreview
+@ExperimentalCoroutinesApi
+fun BlogViewModel.setBlogOrder(order: String?) {
     val update = getCurrentViewStateOrNew()
     update.blogFields.order = order
     setViewState(update)
 }
 
-fun BlogViewModel.removeDeletedBlogPost() {
-    val update = getCurrentViewStateOrNew()
-    val list = update.blogFields.blogList.toMutableList()
-    for (i in 0 until list.size) {
-        if (list[i] == getBlogPost()) {
-            list.remove(getBlogPost())
-            break
-        }
-    }
-    setBlogListData(list)
-}
-
-fun BlogViewModel.setUpdatedBlogFields(
-    title: String?,
-    body: String?,
-    uri: Uri?
-) {
-    val update = getCurrentViewStateOrNew()
-    val updatedBlogFields = update.updateBlogFields
-    title?.let {
-        updatedBlogFields.updatedBlogTitle = it
-    }
-    body?.let {
-        updatedBlogFields.updatedBlogBody = it
-    }
-    uri?.let {
-        updatedBlogFields.updatedImageUri = it
-    }
-    update.updateBlogFields = updatedBlogFields
-    setViewState(update)
-}
-
-fun BlogViewModel.updateListItem(newBlogPost: BlogPost) {
-    val update = getCurrentViewStateOrNew()
-    val list = update.blogFields.blogList.toMutableList()
-    for (i in 0 until list.size) {
-        if (list[i].pk == newBlogPost.pk) {
-            list[i] = newBlogPost
-            break
-        }
-    }
-    update.blogFields.blogList = list
-    setViewState(update)
-}
-
-fun BlogViewModel.clearLayoutManagerState(){
-    val update = getCurrentViewStateOrNew()
-    update.blogFields.layoutManagerState = null
-    setViewState(update)
-}
-
-fun BlogViewModel.setLayoutManagerState (layoutManagerState:Parcelable){
+@FlowPreview
+@ExperimentalCoroutinesApi
+fun BlogViewModel.setLayoutManagerState(layoutManagerState: Parcelable) {
     val update = getCurrentViewStateOrNew()
     update.blogFields.layoutManagerState = layoutManagerState
     setViewState(update)
 }
 
-fun BlogViewModel.onBlogPostUpdateSuccess(blogPost: BlogPost) {
-    setUpdatedBlogFields(
-        uri = null,
-        title = blogPost.title,
-        body = blogPost.body
-    ) // update UpdateBlogFragment
-    setBlogPost (blogPost = blogPost) // updateViewBlogFragment
-    updateListItem(newBlogPost = blogPost) // update BlogFragment
+@FlowPreview
+@ExperimentalCoroutinesApi
+fun BlogViewModel.clearLayoutManagerState() {
+    val update = getCurrentViewStateOrNew()
+    update.blogFields.layoutManagerState = null
+    setViewState(update)
 }
 
+@FlowPreview
+@ExperimentalCoroutinesApi
+fun BlogViewModel.removeDeletedBlogPost() {
+    val update = getCurrentViewStateOrNew()
+    val list = update.blogFields.blogList?.toMutableList()
+    if (list != null) {
+        for (i in 0..(list.size - 1)) {
+            if (list[i] == getBlogPost()) {
+                list.remove(getBlogPost())
+                break
+            }
+        }
+        setBlogListData(list)
+    }
+}
+
+@FlowPreview
+@ExperimentalCoroutinesApi
+fun BlogViewModel.updateListItem() {
+    val update = getCurrentViewStateOrNew()
+    val list = update.blogFields.blogList?.toMutableList()
+    if (list != null) {
+        val newBlogPost = getBlogPost()
+        for (i in 0..(list.size - 1)) {
+            if (list[i].pk == newBlogPost.pk) {
+                list[i] = newBlogPost
+                break
+            }
+        }
+        update.blogFields.blogList = list
+        setViewState(update)
+    }
+}
+
+
+@FlowPreview
+@ExperimentalCoroutinesApi
+fun BlogViewModel.setUpdatedUri(uri: Uri) {
+    val update = getCurrentViewStateOrNew()
+    val updatedBlogFields = update.updatedBlogFields
+    updatedBlogFields.updatedImageUri = uri
+    update.updatedBlogFields = updatedBlogFields
+    setViewState(update)
+}
+
+@FlowPreview
+@ExperimentalCoroutinesApi
+fun BlogViewModel.setUpdatedTitle(title: String) {
+    val update = getCurrentViewStateOrNew()
+    val updatedBlogFields = update.updatedBlogFields
+    updatedBlogFields.updatedBlogTitle = title
+    update.updatedBlogFields = updatedBlogFields
+    setViewState(update)
+}
+
+
+@FlowPreview
+@ExperimentalCoroutinesApi
+fun BlogViewModel.setUpdatedBody(body: String) {
+    val update = getCurrentViewStateOrNew()
+    val updatedBlogFields = update.updatedBlogFields
+    updatedBlogFields.updatedBlogBody = body
+    update.updatedBlogFields = updatedBlogFields
+    setViewState(update)
+}
