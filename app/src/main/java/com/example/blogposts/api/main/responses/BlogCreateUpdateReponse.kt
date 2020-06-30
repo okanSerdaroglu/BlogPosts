@@ -1,9 +1,15 @@
 package com.example.blogposts.api.main.responses
 
+import com.example.blogposts.models.BlogPost
+import com.example.blogposts.utils.DateUtil.Companion.convertServerStringDateToLong
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 
-class BlogSearchResponse(
+class BlogCreateUpdateResponse(
+
+    @SerializedName("response")
+    @Expose
+    var response: String,
 
     @SerializedName("pk")
     @Expose
@@ -35,7 +41,17 @@ class BlogSearchResponse(
 
 
 ) {
-    override fun toString(): String {
-        return "BlogSearchResponse(pk=$pk, title='$title', slug='$slug',  image='$image', date_updated='$date_updated', username='$username')"
+    fun toBlogPost(): BlogPost {
+        return BlogPost(
+            pk = pk,
+            title = title,
+            slug = slug,
+            body = body,
+            image = image,
+            date_updated = convertServerStringDateToLong(
+                date_updated
+            ),
+            username = username
+        )
     }
 }

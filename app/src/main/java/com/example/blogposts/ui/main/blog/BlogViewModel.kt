@@ -3,7 +3,7 @@ package com.example.blogposts.ui.main.blog
 import android.content.SharedPreferences
 import androidx.lifecycle.LiveData
 import com.example.blogposts.persistesnce.BlogQueryUtils
-import com.example.blogposts.repository.main.BlogRepository
+import com.example.blogposts.repository.main.BlogRepositoryImpl
 import com.example.blogposts.session.SessionManager
 import com.example.blogposts.ui.BaseViewModel
 import com.example.blogposts.utils.DataState
@@ -22,7 +22,7 @@ class BlogViewModel
 @Inject
 constructor(
     private val sessionManager: SessionManager,
-    private val blogRepository: BlogRepository,
+    private val blogRepository: BlogRepositoryImpl,
     private val sharedPreferences: SharedPreferences,
     private val editor: SharedPreferences.Editor
 ) : BaseViewModel<BlogStateEvent, BlogViewState>() {

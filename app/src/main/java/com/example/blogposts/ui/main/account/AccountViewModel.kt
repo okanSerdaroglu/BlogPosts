@@ -2,7 +2,7 @@ package com.example.blogposts.ui.main.account
 
 import androidx.lifecycle.LiveData
 import com.example.blogposts.models.AccountProperties
-import com.example.blogposts.repository.main.AccountRepository
+import com.example.blogposts.repository.main.AccountRepositoryImpl
 import com.example.blogposts.session.SessionManager
 import com.example.blogposts.ui.BaseViewModel
 import com.example.blogposts.utils.DataState
@@ -16,7 +16,7 @@ class AccountViewModel
 @Inject
 constructor(
     val sessionManager: SessionManager,
-    val accountRepository: AccountRepository
+    val accountRepository: AccountRepositoryImpl
 ) : BaseViewModel<AccountStateEvent, AccountViewState>() {
 
     override fun handleStateEvent(stateEvent: AccountStateEvent): LiveData<DataState<AccountViewState>> {

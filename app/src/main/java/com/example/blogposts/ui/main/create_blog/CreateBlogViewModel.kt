@@ -3,7 +3,7 @@ package com.example.blogposts.ui.main.create_blog
 import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.liveData
-import com.example.blogposts.repository.main.CreateBlogRepository
+import com.example.blogposts.repository.main.CreateBlogRepositoryImpl
 import com.example.blogposts.session.SessionManager
 import com.example.blogposts.ui.BaseViewModel
 import com.example.blogposts.utils.DataState
@@ -19,7 +19,7 @@ import javax.inject.Inject
 class CreateBlogViewModel
 @Inject
 constructor(
-    val createBlogRepository: CreateBlogRepository,
+    val createBlogRepository: CreateBlogRepositoryImpl,
     val sessionManager: SessionManager
 ) : BaseViewModel<CreateBlogStateEvent, CreateBlogViewState>() {
     override fun handleStateEvent(stateEvent: CreateBlogStateEvent): LiveData<DataState<CreateBlogViewState>> {
