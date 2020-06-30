@@ -10,7 +10,6 @@ import com.example.blogposts.ui.Loading
 import com.example.blogposts.ui.main.account.state.AccountStateEvent
 import com.example.blogposts.ui.main.account.state.AccountStateEvent.*
 import com.example.blogposts.ui.main.account.state.AccountViewState
-import com.example.blogposts.utils.AbsentLiveData
 import javax.inject.Inject
 
 class AccountViewModel

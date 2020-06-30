@@ -14,7 +14,6 @@ import com.example.blogposts.ui.DataState
 import com.example.blogposts.ui.Response
 import com.example.blogposts.ui.ResponseType
 import com.example.blogposts.ui.main.create_blog.state.CreateBlogViewState
-import com.example.blogposts.utils.AbsentLiveData
 import com.example.blogposts.utils.ApiSuccessResponse
 import com.example.blogposts.utils.DateUtil
 import com.example.blogposts.utils.GenericApiResponse

@@ -12,7 +12,6 @@ import com.example.blogposts.ui.main.blog.state.BlogStateEvent
 import com.example.blogposts.ui.main.blog.state.BlogStateEvent.*
 import com.example.blogposts.ui.main.blog.state.BlogViewState
 import com.example.blogposts.ui.main.blog.viewmodel.*
-import com.example.blogposts.utils.AbsentLiveData
 import com.example.blogposts.utils.PreferenceKeys.Companion.BLOG_FILTER
 import com.example.blogposts.utils.PreferenceKeys.Companion.BLOG_ORDER
 import okhttp3.MediaType

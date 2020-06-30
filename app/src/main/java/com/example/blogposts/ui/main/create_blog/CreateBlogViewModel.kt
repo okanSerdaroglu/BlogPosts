@@ -12,7 +12,6 @@ import com.example.blogposts.ui.main.create_blog.state.CreateBlogStateEvent
 import com.example.blogposts.ui.main.create_blog.state.CreateBlogStateEvent.*
 import com.example.blogposts.ui.main.create_blog.state.CreateBlogViewState
 import com.example.blogposts.ui.main.create_blog.state.CreateBlogViewState.*
-import com.example.blogposts.utils.AbsentLiveData
 import okhttp3.MediaType
 import okhttp3.RequestBody
 import javax.inject.Inject

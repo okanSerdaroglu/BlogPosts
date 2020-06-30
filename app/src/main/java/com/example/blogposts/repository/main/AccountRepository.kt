@@ -15,7 +15,6 @@ import com.example.blogposts.ui.DataState
 import com.example.blogposts.ui.Response
 import com.example.blogposts.ui.ResponseType
 import com.example.blogposts.ui.main.account.state.AccountViewState
-import com.example.blogposts.utils.AbsentLiveData
 import com.example.blogposts.utils.ApiSuccessResponse
 import com.example.blogposts.utils.GenericApiResponse
 import kotlinx.coroutines.Dispatchers.Main

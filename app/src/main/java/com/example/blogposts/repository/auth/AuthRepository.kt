@@ -21,7 +21,6 @@ import com.example.blogposts.ui.ResponseType
 import com.example.blogposts.ui.auth.state.AuthViewState
 import com.example.blogposts.ui.auth.state.LoginFields
 import com.example.blogposts.ui.auth.state.RegistrationFields
-import com.example.blogposts.utils.AbsentLiveData
 
 import com.example.blogposts.utils.ApiSuccessResponse
 import com.example.blogposts.utils.ErrorHandling.Companion.ERROR_SAVE_AUTH_TOKEN
