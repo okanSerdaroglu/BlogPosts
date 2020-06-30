@@ -3,7 +3,7 @@ package com.example.blogposts.ui.auth
 import androidx.lifecycle.LiveData
 import com.example.blogposts.models.AuthToken
 
-import com.example.blogposts.repository.auth.AuthRepository
+import com.example.blogposts.repository.auth.AuthRepositoryImpl
 import com.example.blogposts.ui.BaseViewModel
 import com.example.blogposts.utils.DataState
 import com.example.blogposts.utils.Loading
@@ -18,7 +18,7 @@ import javax.inject.Inject
 
 class AuthViewModel
 @Inject
-constructor(val authRepository: AuthRepository) : BaseViewModel<AuthStateEvent, AuthViewState>() {
+constructor(val authRepository: AuthRepositoryImpl) : BaseViewModel<AuthStateEvent, AuthViewState>() {
 
 
     override fun handleStateEvent(stateEvent: AuthStateEvent): LiveData<DataState<AuthViewState>> {

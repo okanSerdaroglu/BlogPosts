@@ -7,7 +7,6 @@ import com.example.blogposts.di.main.MainScope
 import com.example.blogposts.models.AccountProperties
 import com.example.blogposts.models.AuthToken
 import com.example.blogposts.persistesnce.AccountPropertiesDao
-import com.example.blogposts.repository.JobManager
 import com.example.blogposts.repository.NetworkBoundResource
 import com.example.blogposts.session.SessionManager
 import com.example.blogposts.utils.DataState

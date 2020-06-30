@@ -12,7 +12,6 @@ import com.example.blogposts.models.AuthToken
 import com.example.blogposts.models.BlogPost
 import com.example.blogposts.persistesnce.BlogPostDao
 import com.example.blogposts.persistesnce.returnOrderedBlogQuery
-import com.example.blogposts.repository.JobManager
 import com.example.blogposts.repository.NetworkBoundResource
 import com.example.blogposts.session.SessionManager
 import com.example.blogposts.utils.DataState
