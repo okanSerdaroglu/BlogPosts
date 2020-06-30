@@ -29,7 +29,7 @@ import com.example.blogposts.models.BlogPost
 import com.example.blogposts.persistesnce.BlogQueryUtils.Companion.BLOG_FILTER_DATE_UPDATED
 import com.example.blogposts.persistesnce.BlogQueryUtils.Companion.BLOG_FILTER_USERNAME
 import com.example.blogposts.persistesnce.BlogQueryUtils.Companion.BLOG_ORDER_ASC
-import com.example.blogposts.ui.DataState
+import com.example.blogposts.utils.DataState
 import com.example.blogposts.ui.main.blog.state.BLOG_VIEW_STATE_BUNDLE_KEY
 import com.example.blogposts.ui.main.blog.state.BlogViewState
 import com.example.blogposts.ui.main.blog.viewmodel.*

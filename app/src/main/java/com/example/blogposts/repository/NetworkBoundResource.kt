@@ -3,9 +3,9 @@ package com.example.blogposts.repository
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
-import com.example.blogposts.ui.DataState
-import com.example.blogposts.ui.Response
-import com.example.blogposts.ui.ResponseType
+import com.example.blogposts.utils.DataState
+import com.example.blogposts.utils.Response
+import com.example.blogposts.utils.ResponseType
 import com.example.blogposts.utils.*
 import com.example.blogposts.utils.Constants.Companion.NETWORK_TIMEOUT
 import com.example.blogposts.utils.Constants.Companion.TESTING_CACHE_DELAY

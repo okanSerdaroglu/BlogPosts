@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
+import com.example.blogposts.utils.DataState
 
 abstract class BaseViewModel<StateEvent, ViewState> : ViewModel() {
 

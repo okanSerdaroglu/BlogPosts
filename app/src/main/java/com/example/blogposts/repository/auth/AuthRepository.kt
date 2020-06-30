@@ -15,9 +15,9 @@ import com.example.blogposts.persistesnce.AuthTokenDao
 import com.example.blogposts.repository.JobManager
 import com.example.blogposts.repository.NetworkBoundResource
 import com.example.blogposts.session.SessionManager
-import com.example.blogposts.ui.DataState
-import com.example.blogposts.ui.Response
-import com.example.blogposts.ui.ResponseType
+import com.example.blogposts.utils.DataState
+import com.example.blogposts.utils.Response
+import com.example.blogposts.utils.ResponseType
 import com.example.blogposts.ui.auth.state.AuthViewState
 import com.example.blogposts.ui.auth.state.LoginFields
 import com.example.blogposts.ui.auth.state.RegistrationFields
@@ -93,7 +93,10 @@ constructor(
                 if (result < 0) {
                     return onCompleteJob(
                         DataState.error(
-                            Response(ERROR_SAVE_AUTH_TOKEN, ResponseType.Dialog())
+                            Response(
+                                ERROR_SAVE_AUTH_TOKEN,
+                                ResponseType.Dialog()
+                            )
                         )
                     )
                 }
@@ -213,7 +216,10 @@ constructor(
                 super.onActive()
                 value = DataState.data(
                     data = null,
-                    response = Response(RESPONSE_CHECK_PREVIOUS_AUTH_USER_DONE, ResponseType.None())
+                    response = Response(
+                        RESPONSE_CHECK_PREVIOUS_AUTH_USER_DONE,
+                        ResponseType.None()
+                    )
                 )
             }
         }
@@ -293,7 +299,10 @@ constructor(
                 if (result < 0) {
                     return onCompleteJob(
                         DataState.error(
-                            Response(ERROR_SAVE_AUTH_TOKEN, ResponseType.Dialog())
+                            Response(
+                                ERROR_SAVE_AUTH_TOKEN,
+                                ResponseType.Dialog()
+                            )
                         )
                     )
                 }

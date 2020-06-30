@@ -3,7 +3,6 @@ package com.example.blogposts.repository.main
 
 import android.util.Log
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.switchMap
 import com.example.blogposts.api.GenericResponse
 import com.example.blogposts.api.main.BlogPostsMainService
 import com.example.blogposts.api.main.responses.BlogCreateUpdateResponse
@@ -16,9 +15,9 @@ import com.example.blogposts.persistesnce.returnOrderedBlogQuery
 import com.example.blogposts.repository.JobManager
 import com.example.blogposts.repository.NetworkBoundResource
 import com.example.blogposts.session.SessionManager
-import com.example.blogposts.ui.DataState
-import com.example.blogposts.ui.Response
-import com.example.blogposts.ui.ResponseType
+import com.example.blogposts.utils.DataState
+import com.example.blogposts.utils.Response
+import com.example.blogposts.utils.ResponseType
 import com.example.blogposts.ui.main.blog.state.BlogViewState
 import com.example.blogposts.ui.main.blog.state.BlogViewState.*
 import com.example.blogposts.utils.*
@@ -323,7 +322,10 @@ constructor(
                     onCompleteJob(
                         DataState.data(
                             data = null,
-                            response = Response(SUCCESS_BLOG_DELETED, ResponseType.Toast())
+                            response = Response(
+                                SUCCESS_BLOG_DELETED,
+                                ResponseType.Toast()
+                            )
                         )
                     )
                 }

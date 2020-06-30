@@ -16,6 +16,7 @@ import com.example.blogposts.ui.*
 import com.example.blogposts.ui.main.create_blog.state.CREATE_BLOG_VIEW_STATE_BUNDLE_KEY
 import com.example.blogposts.ui.main.create_blog.state.CreateBlogStateEvent
 import com.example.blogposts.ui.main.create_blog.state.CreateBlogViewState
+import com.example.blogposts.utils.*
 import com.example.blogposts.utils.Constants.Companion.GALLERY_REQUEST_CODE
 import com.example.blogposts.utils.ErrorHandling.Companion.ERROR_MUST_SELECT_IMAGE
 import com.example.blogposts.utils.ErrorHandling.Companion.ERROR_SOMETHING_WRONG_WITH_IMAGE
@@ -160,7 +161,11 @@ constructor(
                     )
                 ),
                 loading = Loading(isLoading = false),
-                data = Data(data = Event.dataEvent(null), response = null)
+                data = Data(
+                    data = Event.dataEvent(
+                        null
+                    ), response = null
+                )
             )
         )
     }

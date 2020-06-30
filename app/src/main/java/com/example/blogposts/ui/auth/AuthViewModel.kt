@@ -5,8 +5,8 @@ import com.example.blogposts.models.AuthToken
 
 import com.example.blogposts.repository.auth.AuthRepository
 import com.example.blogposts.ui.BaseViewModel
-import com.example.blogposts.ui.DataState
-import com.example.blogposts.ui.Loading
+import com.example.blogposts.utils.DataState
+import com.example.blogposts.utils.Loading
 import com.example.blogposts.ui.auth.state.AuthStateEvent
 import com.example.blogposts.ui.auth.state.AuthStateEvent.*
 import com.example.blogposts.ui.auth.state.AuthViewState

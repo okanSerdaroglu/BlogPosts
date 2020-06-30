@@ -10,9 +10,9 @@ import com.example.blogposts.persistesnce.BlogPostDao
 import com.example.blogposts.repository.JobManager
 import com.example.blogposts.repository.NetworkBoundResource
 import com.example.blogposts.session.SessionManager
-import com.example.blogposts.ui.DataState
-import com.example.blogposts.ui.Response
-import com.example.blogposts.ui.ResponseType
+import com.example.blogposts.utils.DataState
+import com.example.blogposts.utils.Response
+import com.example.blogposts.utils.ResponseType
 import com.example.blogposts.ui.main.create_blog.state.CreateBlogViewState
 import com.example.blogposts.utils.ApiSuccessResponse
 import com.example.blogposts.utils.DateUtil
@@ -70,7 +70,10 @@ constructor(
                     onCompleteJob(
                         DataState.data(
                             data = null,
-                            response = Response(response.body.response, ResponseType.Dialog())
+                            response = Response(
+                                response.body.response,
+                                ResponseType.Dialog()
+                            )
                         )
                     )
                 }

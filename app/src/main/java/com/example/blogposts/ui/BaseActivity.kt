@@ -10,8 +10,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.example.blogposts.session.SessionManager
-import com.example.blogposts.ui.ResponseType.*
+import com.example.blogposts.utils.ResponseType.*
 import com.example.blogposts.utils.Constants.Companion.PERMISSION_REQUEST_READ_STORAGE
+import com.example.blogposts.utils.DataState
+import com.example.blogposts.utils.Event
+import com.example.blogposts.utils.Response
+import com.example.blogposts.utils.StateError
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch

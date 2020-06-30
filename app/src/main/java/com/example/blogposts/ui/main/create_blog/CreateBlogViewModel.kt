@@ -6,8 +6,8 @@ import androidx.lifecycle.liveData
 import com.example.blogposts.repository.main.CreateBlogRepository
 import com.example.blogposts.session.SessionManager
 import com.example.blogposts.ui.BaseViewModel
-import com.example.blogposts.ui.DataState
-import com.example.blogposts.ui.Loading
+import com.example.blogposts.utils.DataState
+import com.example.blogposts.utils.Loading
 import com.example.blogposts.ui.main.create_blog.state.CreateBlogStateEvent
 import com.example.blogposts.ui.main.create_blog.state.CreateBlogStateEvent.*
 import com.example.blogposts.ui.main.create_blog.state.CreateBlogViewState

@@ -6,8 +6,8 @@ import com.example.blogposts.persistesnce.BlogQueryUtils
 import com.example.blogposts.repository.main.BlogRepository
 import com.example.blogposts.session.SessionManager
 import com.example.blogposts.ui.BaseViewModel
-import com.example.blogposts.ui.DataState
-import com.example.blogposts.ui.Loading
+import com.example.blogposts.utils.DataState
+import com.example.blogposts.utils.Loading
 import com.example.blogposts.ui.main.blog.state.BlogStateEvent
 import com.example.blogposts.ui.main.blog.state.BlogStateEvent.*
 import com.example.blogposts.ui.main.blog.state.BlogViewState

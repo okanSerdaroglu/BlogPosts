@@ -14,14 +14,12 @@ import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.RequestManager
 import com.example.blogposts.R
 import com.example.blogposts.di.main.MainScope
-import com.example.blogposts.ui.*
 import com.example.blogposts.ui.main.blog.state.BLOG_VIEW_STATE_BUNDLE_KEY
 import com.example.blogposts.ui.main.blog.state.BlogStateEvent
 import com.example.blogposts.ui.main.blog.state.BlogViewState
 import com.example.blogposts.ui.main.blog.viewmodel.onBlogPostUpdateSuccess
 import com.example.blogposts.ui.main.blog.viewmodel.setUpdatedBlogFields
-import com.example.blogposts.utils.Constants
-import com.example.blogposts.utils.ErrorHandling
+import com.example.blogposts.utils.*
 import com.theartofdev.edmodo.cropper.CropImage
 import com.theartofdev.edmodo.cropper.CropImageView
 import kotlinx.android.synthetic.main.fragment_update_blog.*
@@ -227,7 +225,11 @@ constructor(
                     )
                 ),
                 loading = Loading(isLoading = false),
-                data = Data(data = Event.dataEvent(null), response = null)
+                data = Data(
+                    data = Event.dataEvent(
+                        null
+                    ), response = null
+                )
             )
         )
     }

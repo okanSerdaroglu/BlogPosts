@@ -15,10 +15,10 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.example.blogposts.R
 import com.example.blogposts.di.auth.AuthScope
-import com.example.blogposts.ui.DataState
+import com.example.blogposts.utils.DataState
 import com.example.blogposts.ui.DataStateChangeListener
-import com.example.blogposts.ui.Response
-import com.example.blogposts.ui.ResponseType
+import com.example.blogposts.utils.Response
+import com.example.blogposts.utils.ResponseType
 import com.example.blogposts.ui.auth.ForgotPasswordFragment.WebAppInterface.OnWebInteractionCallback
 import com.example.blogposts.utils.Constants.Companion.PASSWORD_RESET_URL
 import kotlinx.android.synthetic.main.fragment_forgot_password.*
@@ -60,7 +60,10 @@ constructor(
 
             Log.e(TAG, errorMessage)
             val dataState = DataState.error<Any>(
-                response = Response(errorMessage, ResponseType.Dialog())
+                response = Response(
+                    errorMessage,
+                    ResponseType.Dialog()
+                )
             )
 
             stateChangeListener.onDataStateChange(
