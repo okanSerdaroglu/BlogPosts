@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
 import android.view.*
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.RequestManager
@@ -22,45 +21,29 @@ import com.example.blogposts.utils.ErrorHandling.Companion.ERROR_MUST_SELECT_IMA
 import com.example.blogposts.utils.ErrorHandling.Companion.ERROR_SOMETHING_WRONG_WITH_IMAGE
 import com.example.blogposts.utils.SuccessHandling.Companion.SUCCESS_BLOG_CREATED
 import com.theartofdev.edmodo.cropper.CropImage
-import com.theartofdev.edmodo.cropper.CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE
-import com.theartofdev.edmodo.cropper.CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE
 import com.theartofdev.edmodo.cropper.CropImageView
 import kotlinx.android.synthetic.main.fragment_create_blog.*
-import kotlinx.android.synthetic.main.fragment_view_blog.blog_image
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import java.io.File
 import javax.inject.Inject
 
+@ExperimentalCoroutinesApi
+@FlowPreview
 class CreateBlogFragment
 @Inject
 constructor(
-    private val viewModelFactory: ViewModelProvider.Factory,
+    viewModelFactory: ViewModelProvider.Factory,
     private val requestManager: RequestManager
-) : BaseCreateBlogFragment(R.layout.fragment_create_blog) {
-
-    val viewModel: CreateBlogViewModel by viewModels {
-        viewModelFactory
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-
-        outState.putParcelable(
-            CREATE_BLOG_VIEW_STATE_BUNDLE_KEY,
-            viewModel.viewState.value
-        )
-
-        super.onSaveInstanceState(outState)
-    }
+): BaseCreateBlogFragment(R.layout.fragment_create_blog, viewModelFactory)
+{
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        cancelActiveJobs()
-
-
-        // restore state after process death
+        // Restore state after process death
         savedInstanceState?.let { inState ->
             (inState[CREATE_BLOG_VIEW_STATE_BUNDLE_KEY] as CreateBlogViewState?)?.let { viewState ->
                 viewModel.setViewState(viewState)
@@ -68,38 +51,35 @@ constructor(
         }
     }
 
+    /**
+     * !IMPORTANT!
+     * Must save ViewState b/c in event of process death the LiveData in ViewModel will be lost
+     */
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putParcelable(
+            CREATE_BLOG_VIEW_STATE_BUNDLE_KEY,
+            viewModel.viewState.value
+        )
+        super.onSaveInstanceState(outState)
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setHasOptionsMenu(true)
+
         blog_image.setOnClickListener {
-            if (stateChangeListener.isStoragePermissionGranted()) {
+            if(uiCommunicationListener.isStoragePermissionGranted()){
                 pickFromGallery()
             }
         }
 
         update_textview.setOnClickListener {
-            if (stateChangeListener.isStoragePermissionGranted()) {
+            if(uiCommunicationListener.isStoragePermissionGranted()){
                 pickFromGallery()
             }
         }
+
         subscribeObservers()
-    }
-
-    override fun cancelActiveJobs() {
-
-    }
-
-    private fun setBlogProperties(title: String?, body: String?, image: Uri?) {
-        image?.let {
-            requestManager.load(image).into(blog_image)
-        } ?: setDefaultImage()
-        blog_title.setText(title)
-        blog_body.setText(body)
-    }
-
-    private fun setDefaultImage() {
-        requestManager.load(R.drawable.default_image).into(blog_image)
     }
 
     private fun pickFromGallery() {
@@ -111,76 +91,75 @@ constructor(
         startActivityForResult(intent, GALLERY_REQUEST_CODE)
     }
 
-    private fun launchImageCrop(uri: Uri?) {
-        context?.let {
-            CropImage.activity(uri)
-                .setGuidelines(CropImageView.Guidelines.ON)
-                .start(it, this)
-        }
-    }
+    fun subscribeObservers(){
+        viewModel.viewState.observe(viewLifecycleOwner, Observer { viewState ->
+            viewState.blogFields.let{ newBlogFields ->
+                setBlogProperties(
+                    newBlogFields.newBlogTitle,
+                    newBlogFields.newBlogBody,
+                    newBlogFields.newImageUri
+                )
+            }
+        })
 
-    private fun subscribeObservers() {
-        viewModel.dataState.observe(viewLifecycleOwner, Observer { dataState ->
-            if (dataState != null) {
-                stateChangeListener.onDataStateChange(dataState)
-                dataState.data?.let { data ->
-                    data.response?.let { event ->
-                        event.peekContent().let { response ->
-                            response.message?.let { message ->
-                                if (message == SUCCESS_BLOG_CREATED) {
-                                    viewModel.clearNewBlogFields()
-                                }
-                            }
+        viewModel.numActiveJobs.observe(viewLifecycleOwner, Observer {
+            uiCommunicationListener.displayProgressBar(viewModel.areAnyJobsActive())
+        })
+
+        viewModel.stateMessage.observe(viewLifecycleOwner, Observer { stateMessage ->
+
+            stateMessage?.let {
+                if (it.response.message.equals(SUCCESS_BLOG_CREATED)) {
+                    viewModel.clearNewBlogFields()
+                }
+                uiCommunicationListener.onResponseReceived(
+                    response = it.response,
+                    stateMessageCallback = object: StateMessageCallback {
+                        override fun removeMessageFromStack() {
+                            viewModel.clearStateMessage()
                         }
                     }
-                }
-            }
-        })
-
-        viewModel.viewState.observe(viewLifecycleOwner, Observer { viewState ->
-            viewState.blogFields.let { newBlogFields ->
-                setBlogProperties(
-                    title = newBlogFields.newBlogTitle,
-                    body = newBlogFields.newBlogBody,
-                    image = newBlogFields.newImageUri
                 )
             }
         })
-
     }
 
-    private fun showErrorDialog(errorMessage: String) {
-        stateChangeListener.onDataStateChange(
-            DataState(
-                error = Event(
-                    content = StateError(
-                        response = Response(
-                            message = errorMessage,
-                            responseType = ResponseType.Dialog()
-                        )
-                    )
-                ),
-                loading = Loading(isLoading = false),
-                data = Data(
-                    data = Event.dataEvent(
-                        null
-                    ), response = null
-                )
-            )
-        )
+    private fun setBlogProperties(
+        title: String? = "",
+        body: String? = "",
+        image: Uri?
+    ){
+        if(image != null){
+            requestManager
+                .load(image)
+                .into(blog_image)
+        }
+        else{
+            requestManager
+                .load(R.drawable.default_image)
+                .into(blog_image)
+        }
+
+        blog_title.setText(title)
+        blog_body.setText(body)
     }
+
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK) {
+            Log.d(TAG, "CROP: RESULT OK")
             when (requestCode) {
+
                 GALLERY_REQUEST_CODE -> {
                     data?.data?.let { uri ->
-                        launchImageCrop(uri)
-                    } ?: showErrorDialog(ERROR_SOMETHING_WRONG_WITH_IMAGE)
+                        activity?.let{
+                            launchImageCrop(uri)
+                        }
+                    }?: showErrorDialog(ERROR_SOMETHING_WRONG_WITH_IMAGE)
                 }
 
-                CROP_IMAGE_ACTIVITY_REQUEST_CODE -> {
+                CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE -> {
                     Log.d(TAG, "CROP: CROP_IMAGE_ACTIVITY_REQUEST_CODE")
                     val result = CropImage.getActivityResult(data)
                     val resultUri = result.uri
@@ -192,32 +171,36 @@ constructor(
                     )
                 }
 
-                CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE -> {
+                CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE -> {
+                    Log.d(TAG, "CROP: ERROR")
                     showErrorDialog(ERROR_SOMETHING_WRONG_WITH_IMAGE)
                 }
             }
         }
     }
 
-    override fun onPause() {
-        super.onPause()
-        viewModel.setNewBlogFields(
-            title = blog_title.text.toString(),
-            body = blog_body.text.toString(),
-            uri = null
-        )
+    private fun launchImageCrop(uri: Uri){
+        context?.let{
+            CropImage.activity(uri)
+                .setGuidelines(CropImageView.Guidelines.ON)
+                .start(it, this)
+        }
     }
 
-    private fun publishNewBlog() {
+    private fun publishNewBlog(){
         var multipartBody: MultipartBody.Part? = null
-        viewModel.getNewImageUri()?.let { imageUri ->
-            imageUri.path?.let { filePath ->
+        viewModel.viewState.value?.blogFields?.newImageUri?.let{ imageUri ->
+            imageUri.path?.let{filePath ->
                 val imageFile = File(filePath)
-                Log.d(TAG, "CreateBlogFragment:imageFile: $imageFile")
-                val requestBody = RequestBody.create(
-                    MediaType.parse("image/*"),
-                    imageFile
-                )
+                Log.d(TAG, "CreateBlogFragment, imageFile: file: $imageFile")
+                val requestBody =
+                    RequestBody.create(
+                        MediaType.parse("image/*"),
+                        imageFile
+                    )
+                // name = field name in serializer
+                // filename = name of the image file
+                // requestBody = file with file type information
                 multipartBody = MultipartBody.Part.createFormData(
                     "image",
                     imageFile.name,
@@ -227,6 +210,7 @@ constructor(
         }
 
         multipartBody?.let {
+
             viewModel.setStateEvent(
                 CreateBlogStateEvent.CreateNewBlogEvent(
                     blog_title.text.toString(),
@@ -234,19 +218,44 @@ constructor(
                     it
                 )
             )
-            stateChangeListener.hideSoftKeyboard()
-        } ?: showErrorDialog(ERROR_MUST_SELECT_IMAGE)
+            uiCommunicationListener.hideSoftKeyboard()
+        }?: showErrorDialog(ERROR_MUST_SELECT_IMAGE)
+
+    }
+
+    private fun showErrorDialog(errorMessage: String){
+        uiCommunicationListener.onResponseReceived(
+            response = Response(
+                message = errorMessage,
+                uiComponentType = UIComponentType.Dialog(),
+                messageType = MessageType.Error()
+            ),
+            stateMessageCallback = object: StateMessageCallback{
+                override fun removeMessageFromStack() {
+                    viewModel.clearStateMessage()
+                }
+            }
+        )
+    }
+
+    override fun onPause() {
+        super.onPause()
+        viewModel.setNewBlogFields(
+            blog_title.text.toString(),
+            blog_body.text.toString(),
+            null
+        )
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        super.onCreateOptionsMenu(menu, inflater)
         inflater.inflate(R.menu.publish_menu, menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
+        when(item.itemId){
             R.id.publish -> {
-                val callback: AreYouSureCallback = object : AreYouSureCallback {
+                val callback: AreYouSureCallback = object: AreYouSureCallback {
+
                     override fun proceed() {
                         publishNewBlog()
                     }
@@ -254,12 +263,19 @@ constructor(
                     override fun cancel() {
                         // ignore
                     }
+
                 }
-                uiCommunicationListener.onUIMessageReceived(
-                    UIMessage(
-                        getString(R.string.are_you_sure_publish),
-                        UIMessageType.AreYouSureDialog(callback)
-                    )
+                uiCommunicationListener.onResponseReceived(
+                    response = Response(
+                        message = getString(R.string.are_you_sure_publish),
+                        uiComponentType = UIComponentType.AreYouSureDialog(callback),
+                        messageType = MessageType.Info()
+                    ),
+                    stateMessageCallback = object: StateMessageCallback{
+                        override fun removeMessageFromStack() {
+                            viewModel.clearStateMessage()
+                        }
+                    }
                 )
                 return true
             }

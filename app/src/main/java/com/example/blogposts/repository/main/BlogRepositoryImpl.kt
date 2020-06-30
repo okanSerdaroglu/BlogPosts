@@ -128,7 +128,7 @@ constructor(
                 override suspend fun handleSuccess(resultObj: GenericResponse): DataState<BlogViewState> {
                     val viewState = BlogViewState(
                         viewBlogFields = ViewBlogFields(
-                            isAuthorOfBLogPost = false
+                            isAuthorOfBlogPost = false
                         )
                     )
                     return when (resultObj.response) {
@@ -140,7 +140,7 @@ constructor(
                             )
                         }
                         RESPONSE_HAS_PERMISSION_TO_EDIT -> {
-                            viewState.viewBlogFields.isAuthorOfBLogPost = true
+                            viewState.viewBlogFields.isAuthorOfBlogPost = true
                             DataState.data(
                                 response = null,
                                 data = viewState,
@@ -245,7 +245,7 @@ constructor(
                             viewBlogFields = ViewBlogFields(
                                 blogPost = updatedBlogPost
                             ),
-                            updateBlogFields = UpdateBlogFields(
+                            updatedBlogFields = UpdatedBlogFields(
                                 updatedBlogTitle = updatedBlogPost.title,
                                 updatedBlogBody = updatedBlogPost.body,
                                 updatedImageUri = null

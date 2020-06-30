@@ -7,35 +7,41 @@ import android.view.View
 import androidx.annotation.LayoutRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI
 import com.example.blogposts.R
-import com.example.blogposts.ui.DataStateChangeListener
 import com.example.blogposts.ui.UICommunicationListener
-import com.example.blogposts.ui.main.create_blog.state.CREATE_BLOG_VIEW_STATE_BUNDLE_KEY
-import com.example.blogposts.ui.main.create_blog.state.CreateBlogViewState
+import kotlinx.coroutines.FlowPreview
 
+@FlowPreview
 abstract class BaseCreateBlogFragment
 constructor(
     @LayoutRes
-    private val layoutRes: Int
-) : Fragment(layoutRes) {
+    private val layoutRes: Int,
+    private val viewModelFactory: ViewModelProvider.Factory
+): Fragment(layoutRes)
+{
 
     val TAG: String = "AppDebug"
 
-    lateinit var stateChangeListener: DataStateChangeListener
+    val viewModel: CreateBlogViewModel by viewModels{
+        viewModelFactory
+    }
 
     lateinit var uiCommunicationListener: UICommunicationListener
 
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setUpActionBarWithNavController(R.id.createBlogFragment, activity as AppCompatActivity)
+        setupActionBarWithNavController(R.id.createBlogFragment, activity as AppCompatActivity)
+        setupChannel()
     }
 
-    fun setUpActionBarWithNavController(fragmentId: Int, activity: AppCompatActivity) {
+    private fun setupChannel() = viewModel.setupChannel()
+
+    fun setupActionBarWithNavController(fragmentId: Int, activity: AppCompatActivity){
         val appBarConfiguration = AppBarConfiguration(setOf(fragmentId))
         NavigationUI.setupActionBarWithNavController(
             activity,
@@ -44,22 +50,12 @@ constructor(
         )
     }
 
-    abstract fun cancelActiveJobs()
-
     override fun onAttach(context: Context) {
         super.onAttach(context)
-
-
-        try {
-            stateChangeListener = context as DataStateChangeListener
-        } catch (e: ClassCastException) {
-            Log.e(TAG, "$context must implement DataStateChangeListener")
-        }
-
-        try {
+        try{
             uiCommunicationListener = context as UICommunicationListener
-        } catch (e: ClassCastException) {
-            Log.e(TAG, "$context must implement UICommunicaitonListener")
+        }catch(e: ClassCastException){
+            Log.e(TAG, "$context must implement UICommunicationListener" )
         }
 
     }
